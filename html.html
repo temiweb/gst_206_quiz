@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GST 206 – Quiz Mode</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0f1a;--card:#111827;--accent:#22d3ee;--accent2:#a78bfa;
+--correct:#10b981;--wrong:#ef4444;--text:#e2e8f0;--muted:#64748b;
+--border:#1e293b;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.app{max-width:560px;margin:0 auto;padding:16px 16px 100px}
+header{text-align:center;padding:32px 0 24px}
+header h1{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+header p{font-size:22px;font-weight:700;line-height:1.3}
+.stats-bar{display:flex;gap:8px;margin-bottom:20px}
+.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center}
+.stat .num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
+.stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.stat.score .num{color:var(--accent)}
+.stat.streak .num{color:var(--accent2)}
+.progress-wrap{background:var(--card);border-radius:99px;height:6px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+.q-counter{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:10px;letter-spacing:1px}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 20px;margin-bottom:16px;animation:fadeUp .35s ease}
+.question-card h2{font-size:17px;font-weight:500;line-height:1.55}
+.topic-tag{display:inline-block;font-size:11px;font-family:'Space Mono',monospace;color:var(--accent2);background:rgba(167,139,250,.1);padding:3px 10px;border-radius:99px;margin-bottom:12px;letter-spacing:.5px}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.opt-btn{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;text-align:left;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px;line-height:1.45}
+.opt-btn:active{transform:scale(.98)}
+.opt-btn:hover:not(.disabled){border-color:var(--accent);background:rgba(34,211,238,.04)}
+.opt-btn .key{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--border);flex-shrink:0;margin-top:1px}
+.opt-btn.selected-correct{border-color:var(--correct);background:rgba(16,185,129,.08)}
+.opt-btn.selected-correct .key{background:var(--correct);color:#fff}
+.opt-btn.selected-wrong{border-color:var(--wrong);background:rgba(239,68,68,.08)}
+.opt-btn.selected-wrong .key{background:var(--wrong);color:#fff}
+.opt-btn.show-correct{border-color:var(--correct);background:rgba(16,185,129,.05)}
+.opt-btn.show-correct .key{background:var(--correct);color:#fff}
+.opt-btn.disabled{cursor:default;opacity:.7}
+.opt-btn.disabled.selected-correct,.opt-btn.disabled.selected-wrong,.opt-btn.disabled.show-correct{opacity:1}
+.explanation{background:rgba(34,211,238,.05);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#cbd5e1;animation:fadeUp .3s ease}
+.explanation strong{color:var(--accent);font-weight:600}
+.next-btn{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0f1a;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s;letter-spacing:.5px}
+.next-btn:active{transform:scale(.97)}
+.next-btn:hover{opacity:.9}
+.mode-select{display:flex;gap:8px;margin-bottom:20px}
+.mode-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(34,211,238,.06)}
+.results{text-align:center;padding:40px 0;animation:fadeUp .4s ease}
+.results .big{font-size:64px;font-weight:700;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.results p{color:var(--muted);margin-top:8px;font-size:15px;line-height:1.6}
+.results .retry{margin-top:24px}
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:400px){.app{padding:12px 12px 90px}.question-card{padding:18px 16px}.opt-btn{padding:12px 14px;font-size:14px}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="app" id="app">
+<header>
+<h1>GST 206</h1>
+<p>Environment &amp; Sustainable Development</p>
+</header>
+
+<div class="mode-select">
+<button class="mode-btn active" onclick="setMode('all')">All Topics</button>
+<button class="mode-btn" onclick="setMode('weak')">Weak Areas</button>
+<button class="mode-btn" onclick="setMode('random')">Random 20</button>
+</div>
+
+<div class="stats-bar">
+<div class="stat score"><div class="num" id="scoreNum">0%</div><div class="lbl">Score</div></div>
+<div class="stat streak"><div class="num" id="streakNum">0</div><div class="lbl">Streak</div></div>
+<div class="stat"><div class="num" id="doneNum">0</div><div class="lbl">Done</div></div>
+</div>
+
+<div class="progress-wrap"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+
+<div id="quizArea"></div>
+<div id="resultsArea" class="hidden"></div>
+</div>
+
+<script>
+const allQuestions = [
+  // TOPIC 1: Environment & Ecosystem
+  {t:"Environment & Ecosystem",q:"What does the term 'environment' encompass?",o:["Only the natural world","The surroundings including physical, chemical, and biological factors","Only man-made structures","Only atmospheric conditions"],a:1,e:"Environment includes all physical, chemical, and biological factors surrounding an organism — both natural and human-made."},
+  {t:"Environment & Ecosystem",q:"An ecosystem is best described as:",o:["A community of organisms only","The physical environment only","A community of living organisms interacting with their physical environment","A government policy on nature"],a:2,e:"An ecosystem is the interaction between living organisms (biotic) and their non-living surroundings (abiotic)."},
+  {t:"Environment & Ecosystem",q:"Which of the following is a biotic component of an ecosystem?",o:["Sunlight","Water","Plants","Soil minerals"],a:2,e:"Biotic components are living things — plants, animals, microorganisms. Sunlight, water, and minerals are abiotic."},
+  {t:"Environment & Ecosystem",q:"Which is an abiotic factor in an ecosystem?",o:["Bacteria","Temperature","Fungi","Trees"],a:1,e:"Temperature is a non-living (abiotic) factor. Bacteria, fungi, and trees are all living (biotic)."},
+  {t:"Environment & Ecosystem",q:"The study of the interaction between organisms and their environment is called:",o:["Biology","Ecology","Geography","Geology"],a:1,e:"Ecology is the scientific study of interactions among organisms and between organisms and their environment."},
+  {t:"Environment & Ecosystem",q:"A food chain represents:",o:["The economic cost of food production","The transfer of energy from one organism to another","Government food distribution policy","The chemical composition of food"],a:1,e:"A food chain traces the path of energy transfer from producers through consumers in an ecosystem."},
+
+  // TOPIC 2: Human–Environment Relationship
+  {t:"Human–Environment Relationship",q:"'Environment as an asset' means:",o:["The environment has no economic value","The environment provides resources and services valuable to humans","Only forests have value","The environment is a liability"],a:1,e:"Viewing the environment as an asset recognizes the valuable resources and ecosystem services it provides to humanity."},
+  {t:"Human–Environment Relationship",q:"Which of these is an ecosystem service?",o:["Industrial pollution","Water purification by wetlands","Deforestation","Overfishing"],a:1,e:"Wetlands naturally filter and purify water — a classic example of an ecosystem service that benefits humans."},
+  {t:"Human–Environment Relationship",q:"Deforestation primarily leads to:",o:["Increased biodiversity","Soil erosion, loss of habitat, and climate change","Better air quality","More rainfall"],a:1,e:"Removing forests exposes soil to erosion, destroys habitats, and releases stored carbon, contributing to climate change."},
+  {t:"Human–Environment Relationship",q:"Which human activity contributes MOST to environmental degradation?",o:["Planting trees","Industrialization and urbanization","Wildlife conservation","Organic farming"],a:1,e:"Industrialization and urbanization involve large-scale resource extraction, pollution, and habitat destruction."},
+  {t:"Human–Environment Relationship",q:"The concept of 'carrying capacity' refers to:",o:["How much cargo a ship can hold","The maximum population an environment can sustain indefinitely","The speed of environmental change","Government population targets"],a:1,e:"Carrying capacity is the maximum number of organisms an environment can support without degradation."},
+
+  // TOPIC 3: Global Climate Change
+  {t:"Global Climate Change",q:"Greenhouse gases include all EXCEPT:",o:["Carbon dioxide (CO₂)","Methane (CH₄)","Nitrogen (N₂)","Nitrous oxide (N₂O)"],a:2,e:"Nitrogen (N₂) makes up about 78% of the atmosphere but is NOT a greenhouse gas. CO₂, CH₄, and N₂O are."},
+  {t:"Global Climate Change",q:"The greenhouse effect is:",o:["Always harmful to the planet","The trapping of heat in Earth's atmosphere by certain gases","A type of farming technique","Caused only by human activities"],a:1,e:"The greenhouse effect is the natural process where atmospheric gases trap heat. Without it, Earth would be too cold for life. Human activities intensify it."},
+  {t:"Global Climate Change",q:"Which international agreement aimed to reduce greenhouse gas emissions with binding targets?",o:["The Kyoto Protocol","The Geneva Convention","The Treaty of Versailles","The Warsaw Pact"],a:0,e:"The Kyoto Protocol (1997) set binding emission reduction targets for industrialized nations."},
+  {t:"Global Climate Change",q:"The Paris Agreement of 2015 aims to:",o:["Eliminate all fossil fuels immediately","Limit global warming to well below 2°C above pre-industrial levels","Ban all industrial activity","Focus only on developed countries"],a:1,e:"The Paris Agreement aims to keep global temperature rise well below 2°C, pursuing efforts for 1.5°C."},
+  {t:"Global Climate Change",q:"Which sector is the LARGEST contributor to global greenhouse gas emissions?",o:["Agriculture","Transportation","Energy production (electricity and heat)","Waste management"],a:2,e:"Energy production — burning fossil fuels for electricity and heat — is the single largest source of global emissions."},
+  {t:"Global Climate Change",q:"The IPCC stands for:",o:["International Panel on Carbon Control","Intergovernmental Panel on Climate Change","International Programme for Climate Cooperation","Intergovernmental Policy on Carbon Capture"],a:1,e:"The Intergovernmental Panel on Climate Change (IPCC) is the UN body that assesses climate science."},
+  {t:"Global Climate Change",q:"Global warming refers specifically to:",o:["The rise in Earth's average surface temperature","Seasonal temperature changes","The ozone hole","Volcanic heating"],a:0,e:"Global warming specifically means the long-term increase in Earth's average surface temperature due to rising greenhouse gas concentrations."},
+
+  // TOPIC 4: Natural Resources
+  {t:"Natural Resources",q:"Which of the following is a non-renewable resource?",o:["Solar energy","Timber","Crude oil","Wind"],a:2,e:"Crude oil takes millions of years to form and is consumed much faster than it regenerates — making it non-renewable."},
+  {t:"Natural Resources",q:"Renewable resources are those that:",o:["Can never be depleted","Can be replenished naturally within a human timescale","Are only found underground","Are man-made"],a:1,e:"Renewable resources like forests, fish, and solar energy can regenerate or be replenished within a reasonable timeframe."},
+  {t:"Natural Resources",q:"Which is an example of a renewable resource?",o:["Natural gas","Coal","Wind energy","Petroleum"],a:2,e:"Wind energy is naturally and continuously available and does not deplete with use."},
+  {t:"Natural Resources",q:"Conservation of natural resources means:",o:["Never using any natural resources","Using resources wisely to ensure availability for future generations","Exploiting resources as fast as possible","Importing all resources from abroad"],a:1,e:"Conservation balances current use with preservation so resources remain available for future generations."},
+  {t:"Natural Resources",q:"Minerals such as gold, iron, and copper are classified as:",o:["Renewable resources","Non-renewable resources","Inexhaustible resources","Biological resources"],a:1,e:"Minerals form over geological timescales and cannot be replenished once extracted — they are non-renewable."},
+  {t:"Natural Resources",q:"Which practice helps conserve water resources?",o:["Dumping waste in rivers","Drip irrigation","Excessive dam construction only","Deforestation"],a:1,e:"Drip irrigation delivers water directly to plant roots, minimizing waste and conserving water resources."},
+
+  // TOPIC 5: Sustainable Development — History & Concepts
+  {t:"Sustainable Development",q:"The Brundtland Report (1987) defined sustainable development as:",o:["Maximizing economic growth at any cost","Development that meets present needs without compromising future generations' ability to meet theirs","Stopping all industrial activity","Development focused only on environmental protection"],a:1,e:"The Brundtland Commission's 'Our Common Future' (1987) gave the most widely cited definition of sustainable development."},
+  {t:"Sustainable Development",q:"The Brundtland Commission was also known as:",o:["The Club of Rome","The World Commission on Environment and Development (WCED)","The United Nations General Assembly","The World Trade Organization"],a:1,e:"The WCED, chaired by Gro Harlem Brundtland, produced 'Our Common Future' in 1987."},
+  {t:"Sustainable Development",q:"The three pillars of sustainable development are:",o:["Political, military, and cultural","Economic, social, and environmental","Legal, financial, and technical","Agricultural, industrial, and commercial"],a:1,e:"Sustainable development rests on three interconnected pillars: economic growth, social inclusion, and environmental protection."},
+  {t:"Sustainable Development",q:"The Earth Summit of 1992 was held in:",o:["New York, USA","Johannesburg, South Africa","Rio de Janeiro, Brazil","Kyoto, Japan"],a:2,e:"The 1992 UN Conference on Environment and Development (Earth Summit) was held in Rio de Janeiro."},
+  {t:"Sustainable Development",q:"'Agenda 21' from the 1992 Earth Summit is:",o:["A military strategy","A comprehensive plan for global sustainable development action","A trade agreement","A space exploration program"],a:1,e:"Agenda 21 is a non-binding action plan adopted at Rio, covering sustainable development strategies for the 21st century."},
+  {t:"Sustainable Development",q:"The Club of Rome's 1972 report was titled:",o:["Our Common Future","Silent Spring","The Limits to Growth","An Inconvenient Truth"],a:2,e:"'The Limits to Growth' (1972) used computer modeling to warn about the consequences of unchecked growth on finite resources."},
+  {t:"Sustainable Development",q:"A key criticism of sustainable development is that:",o:["It is too precisely defined","It can be vague and mean different things to different people","It only applies to Africa","It ignores economic growth entirely"],a:1,e:"Critics argue the concept is ambiguous and elastic — used by different groups to justify very different agendas."},
+
+  // TOPIC 6: MDGs and SDGs
+  {t:"MDGs & SDGs",q:"The Millennium Development Goals (MDGs) were adopted in:",o:["1992","2000","2010","2015"],a:1,e:"The MDGs were adopted by world leaders at the UN Millennium Summit in September 2000."},
+  {t:"MDGs & SDGs",q:"How many Millennium Development Goals were there?",o:["5","8","12","17"],a:1,e:"There were 8 MDGs targeting issues like poverty, education, health, and environmental sustainability."},
+  {t:"MDGs & SDGs",q:"The Sustainable Development Goals (SDGs) were adopted in:",o:["2000","2010","2012","2015"],a:3,e:"The 17 SDGs were adopted in September 2015 as part of the 2030 Agenda for Sustainable Development."},
+  {t:"MDGs & SDGs",q:"How many Sustainable Development Goals (SDGs) are there?",o:["8","12","15","17"],a:3,e:"There are 17 SDGs covering a broader range of issues than the MDGs, including inequality, climate, and peace."},
+  {t:"MDGs & SDGs",q:"A major difference between MDGs and SDGs is that:",o:["MDGs had more goals","SDGs apply to ALL countries, not just developing ones","SDGs focus only on health","MDGs included climate change goals"],a:1,e:"Unlike the MDGs which targeted developing countries, the SDGs are universal — applying to every nation."},
+  {t:"MDGs & SDGs",q:"SDG 1 focuses on:",o:["Quality education","No poverty","Clean water","Climate action"],a:1,e:"SDG 1 aims to end poverty in all its forms everywhere by 2030."},
+  {t:"MDGs & SDGs",q:"SDG 13 addresses:",o:["Life below water","Reduced inequalities","Climate action","Decent work"],a:2,e:"SDG 13 calls for urgent action to combat climate change and its impacts."},
+  {t:"MDGs & SDGs",q:"Which of the following was NOT an MDG?",o:["Eradicate extreme poverty and hunger","Achieve universal primary education","Reduce inequality within and among countries","Combat HIV/AIDS, malaria, and other diseases"],a:2,e:"Reducing inequality was introduced as SDG 10. The MDGs focused more narrowly on poverty, health, and education."},
+
+  // TOPIC 7: Population & Economic Sustainability
+  {t:"Population & Economic Growth",q:"Rapid population growth can threaten sustainability by:",o:["Reducing demand for resources","Increasing pressure on natural resources and services","Having no effect on the environment","Automatically improving economic output"],a:1,e:"More people means greater demand for food, water, energy, and land — straining the environment."},
+  {t:"Population & Economic Growth",q:"Economic sustainability in development theory emphasizes:",o:["Unlimited GDP growth regardless of consequences","Maintaining economic output without depleting the resource base","Ignoring environmental costs","Focusing only on short-term profits"],a:1,e:"Economic sustainability means generating wealth in ways that do not degrade the natural or social capital on which the economy depends."},
+  {t:"Population & Economic Growth",q:"The concept of 'weak sustainability' holds that:",o:["Natural capital cannot be substituted","Man-made capital can substitute for natural capital","No economic growth is allowed","Only renewable energy should be used"],a:1,e:"Weak sustainability assumes that human-made capital (technology, infrastructure) can replace depleted natural capital."},
+  {t:"Population & Economic Growth",q:"'Strong sustainability' argues that:",o:["Natural capital and human capital are perfectly interchangeable","Critical natural capital cannot be substituted and must be preserved","Economic growth is impossible","Technology alone can solve all problems"],a:1,e:"Strong sustainability insists some natural assets (like the ozone layer, biodiversity) are irreplaceable and must be maintained."},
+  {t:"Population & Economic Growth",q:"Herman Daly is associated with the concept of:",o:["Unlimited growth economics","Steady-state economics","Trickle-down economics","Supply-side economics"],a:1,e:"Herman Daly advocated for a steady-state economy — one with stable throughput of materials and energy at sustainable levels."},
+
+  // TOPIC 8: Theoretical Perspectives
+  {t:"Theoretical Perspectives",q:"Urban sustainability focuses on:",o:["Only rural development","Making cities economically, socially, and environmentally viable long-term","Eliminating all cities","Reducing urban population to zero"],a:1,e:"Urban sustainability aims to create cities that balance economic vitality, social equity, and environmental health."},
+  {t:"Theoretical Perspectives",q:"The 'triple bottom line' refers to evaluating performance based on:",o:["Only profit","Profit, people, and planet","Revenue, expenses, and taxes","Import, export, and GDP"],a:1,e:"The triple bottom line framework evaluates organizational success across three dimensions: economic (profit), social (people), and environmental (planet)."},
+  {t:"Theoretical Perspectives",q:"Ecological economics differs from mainstream economics by:",o:["Ignoring the economy","Treating the economy as a subsystem of the larger ecosystem","Focusing only on trade","Rejecting all technology"],a:1,e:"Ecological economics sees the economy as embedded within the biosphere, subject to ecological limits."},
+  {t:"Theoretical Perspectives",q:"'Natural capital' refers to:",o:["Money earned from farming","The world's stock of natural resources and ecosystem services","Only mineral deposits","Government environmental spending"],a:1,e:"Natural capital includes all natural assets — forests, water, soil, minerals, biodiversity — and the services they provide."},
+
+  // TOPIC 9: Bio-economy
+  {t:"Bio-economy",q:"Bio-economy is best defined as:",o:["An economy based solely on oil","An economy that uses biological resources, processes, and principles for sustainable production","An economy without any technology","An economy focused only on medicine"],a:1,e:"The bio-economy leverages renewable biological resources and bio-based processes across sectors for sustainability."},
+  {t:"Bio-economy",q:"Bio-economy as 'green economy' emphasizes:",o:["Maximizing fossil fuel use","Economic growth that reduces environmental risks and ecological scarcities","Ignoring social equity","Only agricultural activities"],a:1,e:"The green economy framing focuses on growth that is low-carbon, resource-efficient, and socially inclusive."},
+  {t:"Bio-economy",q:"Which of these is a principle of bio-economy?",o:["Unlimited extraction of resources","Sustainable use of biological resources","Dependence on fossil fuels","Ignoring innovation"],a:1,e:"A core principle of bio-economy is the sustainable and efficient use of biological resources and waste streams."},
+  {t:"Bio-economy",q:"Georgescu-Roegen's bio-economics relates economic processes to:",o:["Only market prices","The laws of thermodynamics and biological principles","Political party platforms","Military strategy"],a:1,e:"Georgescu-Roegen grounded economics in thermodynamics, arguing that entropy limits economic processes."},
+  {t:"Bio-economy",q:"Bio-economy as a strategy involves:",o:["Abandoning all modern technology","Using biotechnology and innovation to replace fossil-based inputs","Only traditional farming","Reducing all economic activity"],a:1,e:"Bio-economy strategies promote innovation in biotechnology, renewable materials, and bio-based industries."},
+
+  // TOPIC 10: Ecotourism
+  {t:"Ecotourism",q:"Ecotourism is defined as:",o:["Mass tourism to popular beaches","Responsible travel to natural areas that conserves the environment and benefits local people","Luxury hotel tourism","Industrial tourism"],a:1,e:"Ecotourism combines nature conservation, community benefit, and environmental education through responsible travel."},
+  {t:"Ecotourism",q:"A key benefit of ecotourism is:",o:["Increased pollution","Providing income for local communities while preserving nature","Destruction of wildlife habitats","Overcrowding of natural sites"],a:1,e:"Well-managed ecotourism generates revenue for communities and creates economic incentives for conservation."},
+  {t:"Ecotourism",q:"A potential negative impact of ecotourism is:",o:["Too much conservation","Disturbance to wildlife and ecosystems if not properly managed","Excessive community benefit","Too much education"],a:1,e:"Without proper management, even eco-tourists can disturb wildlife, erode trails, and strain local resources."},
+  {t:"Ecotourism",q:"Which principle is central to ecotourism?",o:["Maximizing visitor numbers at all costs","Minimizing environmental impact while educating visitors","Building large resorts in forests","Exploiting natural resources for profit"],a:1,e:"Ecotourism prioritizes minimal environmental footprint and meaningful education about the natural environment."},
+  {t:"Ecotourism",q:"Ecotourism contributes to sustainable development by:",o:["Replacing all other industries","Linking conservation with local economic development","Ignoring local communities","Promoting deforestation"],a:1,e:"Ecotourism bridges conservation goals with economic livelihood, making preservation financially viable for communities."},
+
+  // TOPIC 11: Additional mixed questions
+  {t:"Environment & Ecosystem",q:"Biodiversity refers to:",o:["Only the number of animals in an area","The variety of life at all levels — genetic, species, and ecosystem","Only plant species","Only marine organisms"],a:1,e:"Biodiversity encompasses the full variety of life: genetic diversity within species, species diversity, and ecosystem diversity."},
+  {t:"Global Climate Change",q:"Ozone layer depletion is primarily caused by:",o:["Carbon dioxide","Chlorofluorocarbons (CFCs)","Methane","Water vapor"],a:1,e:"CFCs release chlorine atoms in the stratosphere that catalytically destroy ozone molecules."},
+  {t:"Global Climate Change",q:"Acid rain is caused mainly by emissions of:",o:["Carbon dioxide and methane","Sulphur dioxide and nitrogen oxides","Oxygen and hydrogen","CFCs and ozone"],a:1,e:"SO₂ and NOₓ from burning fossil fuels react with water vapor to form sulphuric and nitric acids."},
+  {t:"Sustainable Development",q:"The concept of 'intergenerational equity' in sustainability means:",o:["Only the current generation matters","Future generations have the right to the same resources and opportunities","Resources should be used up now","Equity only applies within one generation"],a:1,e:"Intergenerational equity is the ethical principle that we must not compromise future generations' access to resources."},
+  {t:"Natural Resources",q:"Desertification is:",o:["The creation of new deserts for tourism","Land degradation in dry areas due to climate and human activities","A type of irrigation","Planting desert plants"],a:1,e:"Desertification is the process by which fertile land becomes increasingly arid, often due to overgrazing, deforestation, and drought."},
+  {t:"Sustainable Development",q:"Which of these is NOT a principle of sustainable development?",o:["Polluter pays principle","Precautionary principle","Maximum exploitation principle","Intergenerational equity"],a:2,e:"'Maximum exploitation' contradicts sustainability. The polluter pays, precautionary, and intergenerational equity principles all support it."},
+  {t:"MDGs & SDGs",q:"SDG 7 aims to ensure:",o:["Zero hunger","Affordable and clean energy for all","Gender equality","Life on land"],a:1,e:"SDG 7 focuses on ensuring access to affordable, reliable, sustainable, and modern energy for all."},
+  {t:"Population & Economic Growth",q:"The 'tragedy of the commons' describes:",o:["A successful shared resource system","Overexploitation of shared resources when individuals act in self-interest","Government land redistribution","A historical battle"],a:1,e:"The tragedy of the commons shows how individuals acting in self-interest can deplete shared resources, harming everyone."},
+  {t:"Environment & Ecosystem",q:"A food web differs from a food chain because it:",o:["Is simpler","Shows multiple interconnected feeding relationships","Includes only producers","Ignores decomposers"],a:1,e:"A food web is a complex network of interconnected food chains showing the full picture of who eats whom in an ecosystem."},
+  {t:"Sustainable Development",q:"The Rio+20 conference (2012) resulted in the document titled:",o:["Our Common Future","The Limits to Growth","The Future We Want","Silent Spring"],a:2,e:"'The Future We Want' was the outcome document of the 2012 Rio+20 conference, renewing commitment to sustainable development."},
+];
+
+// Shuffle utility
+function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+let mode='all', questions=[], qi=0, correct=0, answered=0, streak=0, bestStreak=0;
+let weakTopics={};
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.mode-btn[onclick="setMode('${m}')"]`).classList.add('active');
+  startQuiz();
+}
+
+function startQuiz(){
+  qi=0;correct=0;answered=0;streak=0;
+  document.getElementById('resultsArea').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  
+  if(mode==='weak'){
+    let topics=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+    if(topics.length===0) topics=[...new Set(allQuestions.map(q=>q.t))];
+    questions=shuffle(allQuestions.filter(q=>topics.includes(q.t)));
+  } else if(mode==='random'){
+    questions=shuffle(allQuestions).slice(0,20);
+  } else {
+    questions=shuffle(allQuestions);
+  }
+  updateStats();
+  showQuestion();
+}
+
+function updateStats(){
+  let pct=answered?Math.round((correct/answered)*100):0;
+  document.getElementById('scoreNum').textContent=pct+'%';
+  document.getElementById('streakNum').textContent=streak;
+  document.getElementById('doneNum').textContent=answered+'/'+questions.length;
+  document.getElementById('progFill').style.width=(answered/questions.length*100)+'%';
+}
+
+let currentShuffledAnswer=-1;
+
+function showQuestion(){
+  if(qi>=questions.length){showResults();return}
+  let q=questions[qi];
+  // Build indices and shuffle them
+  let indices=[0,1,2,3];
+  for(let i=indices.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]]}
+  // Track where the correct answer ended up
+  currentShuffledAnswer=indices.indexOf(q.a);
+  let shuffledOpts=indices.map(i=>q.o[i]);
+
+  let html=`<div class="q-counter">QUESTION ${qi+1} of ${questions.length}</div>
+  <div class="question-card">
+    <span class="topic-tag">${q.t}</span>
+    <h2>${q.q}</h2>
+  </div>
+  <div class="options">`;
+  let keys=['A','B','C','D'];
+  shuffledOpts.forEach((opt,i)=>{
+    html+=`<button class="opt-btn" onclick="pick(${i})" id="opt${i}">
+      <span class="key">${keys[i]}</span><span>${opt}</span>
+    </button>`;
+  });
+  html+=`</div><div id="feedback"></div>`;
+  document.getElementById('quizArea').innerHTML=html;
+}
+
+function pick(i){
+  let q=questions[qi];
+  let btns=document.querySelectorAll('.opt-btn');
+  btns.forEach(b=>{b.classList.add('disabled');b.onclick=null});
+  
+  answered++;
+  if(i===currentShuffledAnswer){
+    correct++;streak++;
+    if(streak>bestStreak)bestStreak=streak;
+    btns[i].classList.add('selected-correct');
+  } else {
+    streak=0;
+    btns[i].classList.add('selected-wrong');
+    btns[currentShuffledAnswer].classList.add('show-correct');
+    weakTopics[q.t]=(weakTopics[q.t]||0)+1;
+  }
+  updateStats();
+  
+  let fb=`<div class="explanation"><strong>${i===currentShuffledAnswer?'Correct!':'Not quite.'}</strong> ${q.e}</div>
+  <button class="next-btn" onclick="qi++;showQuestion()">${qi<questions.length-1?'Next Question →':'See Results →'}</button>`;
+  document.getElementById('feedback').innerHTML=fb;
+}
+
+function showResults(){
+  document.getElementById('quizArea').classList.add('hidden');
+  let pct=Math.round((correct/answered)*100);
+  let msg=pct>=80?'Strong performance! You\'re well-prepared.':pct>=60?'Good foundation. Review your weak areas once more.':'Keep at it — focus on the topics flagged below.';
+  let weakList=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]);
+  let weakHtml=weakList.length?'<br><br><strong style="color:var(--accent2)">Focus areas:</strong> '+weakList.slice(0,3).map(e=>e[0]).join(', '):'';
+  
+  document.getElementById('resultsArea').innerHTML=`<div class="results">
+    <div class="big">${pct}%</div>
+    <p>${correct} out of ${answered} correct · Best streak: ${bestStreak}${weakHtml}</p>
+    <p style="margin-top:12px">${msg}</p>
+    <button class="next-btn retry" onclick="setMode('all')" style="max-width:280px;margin:24px auto 8px">Retry All</button>
+    ${weakList.length?`<button class="next-btn retry" onclick="setMode('weak')" style="max-width:280px;margin:8px auto;background:linear-gradient(135deg,var(--accent2),#ec4899)">Practice Weak Areas</button>`:''}
+  </div>`;
+  document.getElementById('resultsArea').classList.remove('hidden');
+}
+
+startQuiz();
+</script>
+</body>
+</html>
