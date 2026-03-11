@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>GST 206 – Quiz Mode</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -10,341 +10,484 @@
 :root{
 --bg:#0a0f1a;--card:#111827;--accent:#22d3ee;--accent2:#a78bfa;
 --correct:#10b981;--wrong:#ef4444;--text:#e2e8f0;--muted:#64748b;
---border:#1e293b;
+--border:#1e293b;--warn:#f59e0b;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-.noise{position:fixed;inset:0;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .app{max-width:560px;margin:0 auto;padding:16px 16px 100px}
-header{text-align:center;padding:32px 0 24px}
-header h1{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
-header p{font-size:22px;font-weight:700;line-height:1.3}
-.stats-bar{display:flex;gap:8px;margin-bottom:20px}
-.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center}
-.stat .num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
-.stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+header{text-align:center;padding:24px 0 16px}
+header h1{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+header p{font-size:20px;font-weight:700;line-height:1.3}
+.stats-bar{display:flex;gap:6px;margin-bottom:14px}
+.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.stat .num{font-family:'Space Mono',monospace;font-size:18px;font-weight:700}
+.stat .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
 .stat.score .num{color:var(--accent)}
 .stat.streak .num{color:var(--accent2)}
-.progress-wrap{background:var(--card);border-radius:99px;height:6px;margin-bottom:24px;overflow:hidden}
+.stat.timer .num{color:var(--warn)}
+.progress-wrap{background:var(--card);border-radius:99px;height:5px;margin-bottom:18px;overflow:hidden}
 .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
-.q-counter{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:10px;letter-spacing:1px}
-.question-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 20px;margin-bottom:16px;animation:fadeUp .35s ease}
-.question-card h2{font-size:17px;font-weight:500;line-height:1.55}
-.topic-tag{display:inline-block;font-size:11px;font-family:'Space Mono',monospace;color:var(--accent2);background:rgba(167,139,250,.1);padding:3px 10px;border-radius:99px;margin-bottom:12px;letter-spacing:.5px}
-.options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
-.opt-btn{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;text-align:left;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px;line-height:1.45}
+.q-counter{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
+.q-counter .actions button{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px;transition:color .2s}
+.q-counter .actions button:hover{color:var(--accent)}
+.q-counter .actions button.bookmarked{color:var(--warn)}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 18px;margin-bottom:14px;animation:fadeUp .3s ease}
+.question-card h2{font-size:16px;font-weight:500;line-height:1.55}
+.topic-tag{display:inline-block;font-size:10px;font-family:'Space Mono',monospace;color:var(--accent2);background:rgba(167,139,250,.1);padding:2px 8px;border-radius:99px;margin-bottom:10px;letter-spacing:.5px}
+.options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.opt-btn{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;text-align:left;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10px;line-height:1.45}
 .opt-btn:active{transform:scale(.98)}
 .opt-btn:hover:not(.disabled){border-color:var(--accent);background:rgba(34,211,238,.04)}
-.opt-btn .key{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--border);flex-shrink:0;margin-top:1px}
+.opt-btn .key{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:var(--border);flex-shrink:0;margin-top:1px}
 .opt-btn.selected-correct{border-color:var(--correct);background:rgba(16,185,129,.08)}
 .opt-btn.selected-correct .key{background:var(--correct);color:#fff}
 .opt-btn.selected-wrong{border-color:var(--wrong);background:rgba(239,68,68,.08)}
 .opt-btn.selected-wrong .key{background:var(--wrong);color:#fff}
 .opt-btn.show-correct{border-color:var(--correct);background:rgba(16,185,129,.05)}
 .opt-btn.show-correct .key{background:var(--correct);color:#fff}
-.opt-btn.disabled{cursor:default;opacity:.7}
+.opt-btn.disabled{cursor:default;opacity:.6}
 .opt-btn.disabled.selected-correct,.opt-btn.disabled.selected-wrong,.opt-btn.disabled.show-correct{opacity:1}
-.explanation{background:rgba(34,211,238,.05);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#cbd5e1;animation:fadeUp .3s ease}
+.explanation{background:rgba(34,211,238,.05);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.6;color:#cbd5e1;animation:fadeUp .25s ease}
 .explanation strong{color:var(--accent);font-weight:600}
-.next-btn{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0f1a;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s;letter-spacing:.5px}
+.next-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0f1a;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s;letter-spacing:.3px}
 .next-btn:active{transform:scale(.97)}
-.next-btn:hover{opacity:.9}
-.mode-select{display:flex;gap:8px;margin-bottom:20px}
-.mode-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-.mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(34,211,238,.06)}
-.results{text-align:center;padding:40px 0;animation:fadeUp .4s ease}
-.results .big{font-size:64px;font-weight:700;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.results p{color:var(--muted);margin-top:8px;font-size:15px;line-height:1.6}
-.results .retry{margin-top:24px}
+.skip-btn{width:100%;padding:13px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:8px}
+.skip-btn:hover{border-color:var(--muted);color:var(--text)}
+.setup{animation:fadeUp .3s ease}
+.setup h2{font-size:18px;font-weight:700;margin-bottom:16px}
+.setup-section{margin-bottom:20px}
+.setup-section label{display:block;font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.size-options{display:flex;gap:6px;flex-wrap:wrap}
+.size-btn{padding:10px 16px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.size-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(34,211,238,.06)}
+.size-btn:hover:not(.active){border-color:var(--muted)}
+.topic-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:11px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s}
+.chip.active{border-color:var(--accent2);color:var(--accent2);background:rgba(167,139,250,.08)}
+.chip:hover:not(.active){border-color:var(--muted)}
+.mode-pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .15s}
+.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(34,211,238,.06)}
+.start-btn{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0f1a;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.3px}
+.start-btn:active{transform:scale(.98)}
+.q-total{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin:12px 0 4px;letter-spacing:.5px}
+.results{text-align:center;padding:32px 0;animation:fadeUp .35s ease}
+.results .big{font-size:56px;font-weight:700;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.results p{color:var(--muted);margin-top:6px;font-size:14px;line-height:1.6}
+.results .grade{font-size:15px;font-weight:700;margin-top:12px;padding:8px 20px;border-radius:99px;display:inline-block}
+.grade-a{background:rgba(16,185,129,.15);color:var(--correct)}
+.grade-b{background:rgba(34,211,238,.15);color:var(--accent)}
+.grade-c{background:rgba(245,158,11,.15);color:var(--warn)}
+.grade-f{background:rgba(239,68,68,.15);color:var(--wrong)}
+.result-details{text-align:left;margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.result-details h3{font-size:12px;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.topic-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px}
+.result-btns{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.result-btns .next-btn{padding:14px}
 .hidden{display:none!important}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:400px){.app{padding:12px 12px 90px}.question-card{padding:18px 16px}.opt-btn{padding:12px 14px;font-size:14px}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:380px){.app{padding:10px 10px 80px}.question-card{padding:16px 14px}.opt-btn{padding:10px 12px;font-size:13px}.stat .num{font-size:16px}}
 </style>
 </head>
 <body>
 <div class="noise"></div>
-<div class="app" id="app">
+<div class="app">
 <header>
 <h1>GST 206</h1>
 <p>Environment &amp; Sustainable Development</p>
 </header>
-
-<div class="mode-select">
-<button class="mode-btn active" onclick="setMode('all')">All Topics</button>
-<button class="mode-btn" onclick="setMode('weak')">Weak Areas</button>
-<button class="mode-btn" onclick="setMode('random')">Random 20</button>
+<div id="setupArea"></div>
+<div id="quizHeader" class="hidden">
+  <div class="stats-bar">
+    <div class="stat score"><div class="num" id="scoreNum">0%</div><div class="lbl">Score</div></div>
+    <div class="stat streak"><div class="num" id="streakNum">0</div><div class="lbl">Streak</div></div>
+    <div class="stat timer"><div class="num" id="timerNum">0:00</div><div class="lbl">Time</div></div>
+    <div class="stat"><div class="num" id="doneNum">0</div><div class="lbl">Done</div></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progFill"></div></div>
 </div>
-
-<div class="stats-bar">
-<div class="stat score"><div class="num" id="scoreNum">0%</div><div class="lbl">Score</div></div>
-<div class="stat streak"><div class="num" id="streakNum">0</div><div class="lbl">Streak</div></div>
-<div class="stat"><div class="num" id="doneNum">0</div><div class="lbl">Done</div></div>
-</div>
-
-<div class="progress-wrap"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-
-<div id="quizArea"></div>
+<div id="quizArea" class="hidden"></div>
 <div id="resultsArea" class="hidden"></div>
 </div>
-
 <script>
-const allQuestions = [
-  // TOPIC 1: Environment & Ecosystem
-  {t:"Environment & Ecosystem",q:"What does the term 'environment' encompass?",o:["Only the natural world","The surroundings including physical, chemical, and biological factors","Only man-made structures","Only atmospheric conditions"],a:1,e:"Environment includes all physical, chemical, and biological factors surrounding an organism — both natural and human-made."},
-  {t:"Environment & Ecosystem",q:"An ecosystem is best described as:",o:["A community of organisms only","The physical environment only","A community of living organisms interacting with their physical environment","A government policy on nature"],a:2,e:"An ecosystem is the interaction between living organisms (biotic) and their non-living surroundings (abiotic)."},
-  {t:"Environment & Ecosystem",q:"Which of the following is a biotic component of an ecosystem?",o:["Sunlight","Water","Plants","Soil minerals"],a:2,e:"Biotic components are living things — plants, animals, microorganisms. Sunlight, water, and minerals are abiotic."},
-  {t:"Environment & Ecosystem",q:"Which is an abiotic factor in an ecosystem?",o:["Bacteria","Temperature","Fungi","Trees"],a:1,e:"Temperature is a non-living (abiotic) factor. Bacteria, fungi, and trees are all living (biotic)."},
-  {t:"Environment & Ecosystem",q:"The study of the interaction between organisms and their environment is called:",o:["Biology","Ecology","Geography","Geology"],a:1,e:"Ecology is the scientific study of interactions among organisms and between organisms and their environment."},
-  {t:"Environment & Ecosystem",q:"A food chain represents:",o:["The economic cost of food production","The transfer of energy from one organism to another","Government food distribution policy","The chemical composition of food"],a:1,e:"A food chain traces the path of energy transfer from producers through consumers in an ecosystem."},
+const Q=[
+// ENVIRONMENT & ECOSYSTEM
+{t:"Environment & Ecosystem",q:"What does the term 'environment' encompass?",o:["Only the natural world","The surroundings including physical, chemical, and biological factors","Only man-made structures","Only atmospheric conditions"],a:1,e:"Environment includes all physical, chemical, and biological factors — both natural and human-made."},
+{t:"Environment & Ecosystem",q:"An ecosystem is best described as:",o:["A community of organisms only","The physical environment only","A community of living organisms interacting with their physical environment","A government policy on nature"],a:2,e:"An ecosystem is the interaction between living organisms (biotic) and their non-living surroundings (abiotic)."},
+{t:"Environment & Ecosystem",q:"Which of the following is a biotic component?",o:["Sunlight","Water","Plants","Soil minerals"],a:2,e:"Biotic components are living things — plants, animals, microorganisms."},
+{t:"Environment & Ecosystem",q:"Which is an abiotic factor in an ecosystem?",o:["Bacteria","Temperature","Fungi","Trees"],a:1,e:"Temperature is non-living (abiotic). Bacteria, fungi, and trees are biotic."},
+{t:"Environment & Ecosystem",q:"The study of organism–environment interactions is called:",o:["Biology","Ecology","Geography","Geology"],a:1,e:"Ecology studies interactions among organisms and between organisms and their environment."},
+{t:"Environment & Ecosystem",q:"A food chain represents:",o:["The economic cost of food","The transfer of energy from one organism to another","Government food policy","Chemical composition of food"],a:1,e:"A food chain traces energy transfer from producers through consumers."},
+{t:"Environment & Ecosystem",q:"Environment refers to:",o:["Only plants","Only animals","The surroundings of living and non-living things","Only water"],a:2,e:"Environment includes both living and non-living components."},
+{t:"Environment & Ecosystem",q:"The biotic component includes:",o:["Soil and water","Plants and animals","Air and sunlight","Rocks"],a:1,e:"Biotic = living. Plants and animals are living components."},
+{t:"Environment & Ecosystem",q:"Abiotic factors include:",o:["Plants","Animals","Microorganisms","Soil and sunlight"],a:3,e:"Abiotic = non-living elements like soil, sunlight, temperature."},
+{t:"Environment & Ecosystem",q:"Which is NOT part of an ecosystem?",o:["Producers","Consumers","Decomposers","Computers"],a:3,e:"Computers are human-made, not ecosystem components."},
+{t:"Environment & Ecosystem",q:"Green plants are known as:",o:["Consumers","Producers","Decomposers","Parasites"],a:1,e:"Plants produce food via photosynthesis."},
+{t:"Environment & Ecosystem",q:"Animals that eat plants are called:",o:["Carnivores","Herbivores","Omnivores","Parasites"],a:1,e:"Herbivores are primary consumers feeding on plants."},
+{t:"Environment & Ecosystem",q:"Animals eating both plants and animals are:",o:["Carnivores","Herbivores","Omnivores","Decomposers"],a:2,e:"Omnivores have a mixed diet — humans are a common example."},
+{t:"Environment & Ecosystem",q:"Organisms that break down dead materials are:",o:["Producers","Decomposers","Consumers","Predators"],a:1,e:"Decomposers like bacteria and fungi recycle nutrients."},
+{t:"Environment & Ecosystem",q:"Biodiversity refers to:",o:["Only animal count","Variety of life at genetic, species, and ecosystem levels","Only plant species","Only marine organisms"],a:1,e:"Biodiversity encompasses genetic, species, and ecosystem diversity."},
+{t:"Environment & Ecosystem",q:"A food web differs from a food chain because it:",o:["Is simpler","Shows multiple interconnected feeding relationships","Includes only producers","Ignores decomposers"],a:1,e:"A food web is a complex network of interconnected food chains."},
+{t:"Environment & Ecosystem",q:"A biome is best described as:",o:["A single organism","A large geographic area with distinct climate and organisms","A type of pollution","A farming method"],a:1,e:"Biomes are large-scale ecosystems defined by climate and dominant vegetation."},
+{t:"Environment & Ecosystem",q:"The water cycle includes all EXCEPT:",o:["Evaporation","Condensation","Precipitation","Combustion"],a:3,e:"Combustion is a chemical process, not part of the water cycle."},
+{t:"Environment & Ecosystem",q:"Ecological balance means:",o:["Harmony between organisms and environment","Destruction of nature","Pollution increase","Elimination of animals"],a:0,e:"Ecological balance is a stable equilibrium between species and their environment."},
+{t:"Environment & Ecosystem",q:"Habitat destruction leads to:",o:["More biodiversity","Loss of biodiversity","Environmental improvement","Soil formation"],a:1,e:"Destroying habitats removes living spaces, driving species loss."},
+{t:"Environment & Ecosystem",q:"Primary succession occurs on:",o:["Previously vegetated land","Bare rock or new land with no soil","Farmland","Urban areas"],a:1,e:"Primary succession begins on completely new surfaces with no existing soil."},
+{t:"Environment & Ecosystem",q:"The trophic level with most energy is:",o:["Top predators","Secondary consumers","Primary consumers","Producers"],a:3,e:"Producers capture energy directly from sunlight — about 90% is lost at each subsequent level."},
+{t:"Environment & Ecosystem",q:"Symbiosis refers to:",o:["Competition","A close, long-term interaction between two species","Predation","Decomposition"],a:1,e:"Symbiosis includes mutualism, commensalism, and parasitism."},
+{t:"Environment & Ecosystem",q:"A keystone species is one whose:",o:["Population is largest","Removal drastically changes an ecosystem","Diet is most varied","Habitat is smallest"],a:1,e:"Keystone species have disproportionately large effects on their ecosystem."},
+{t:"Environment & Ecosystem",q:"Photosynthesis converts:",o:["Oxygen to carbon dioxide","Light energy to chemical energy in glucose","Glucose to oxygen","Water to minerals"],a:1,e:"Plants use sunlight to convert CO₂ and water into glucose and oxygen."},
+{t:"Environment & Ecosystem",q:"The lithosphere refers to:",o:["The water component of Earth","The air and atmosphere","The solid outer layer of Earth","The living organisms on Earth"],a:2,e:"The lithosphere is Earth's rigid outer shell — the crust and upper mantle."},
+{t:"Environment & Ecosystem",q:"Nitrogen fixation is important because it:",o:["Removes nitrogen from the atmosphere permanently","Converts atmospheric nitrogen into forms usable by plants","Creates oxygen","Causes acid rain"],a:1,e:"Nitrogen-fixing bacteria convert N₂ into ammonia, making it available for plant uptake."},
 
-  // TOPIC 2: Human–Environment Relationship
-  {t:"Human–Environment Relationship",q:"'Environment as an asset' means:",o:["The environment has no economic value","The environment provides resources and services valuable to humans","Only forests have value","The environment is a liability"],a:1,e:"Viewing the environment as an asset recognizes the valuable resources and ecosystem services it provides to humanity."},
-  {t:"Human–Environment Relationship",q:"Which of these is an ecosystem service?",o:["Industrial pollution","Water purification by wetlands","Deforestation","Overfishing"],a:1,e:"Wetlands naturally filter and purify water — a classic example of an ecosystem service that benefits humans."},
-  {t:"Human–Environment Relationship",q:"Deforestation primarily leads to:",o:["Increased biodiversity","Soil erosion, loss of habitat, and climate change","Better air quality","More rainfall"],a:1,e:"Removing forests exposes soil to erosion, destroys habitats, and releases stored carbon, contributing to climate change."},
-  {t:"Human–Environment Relationship",q:"Which human activity contributes MOST to environmental degradation?",o:["Planting trees","Industrialization and urbanization","Wildlife conservation","Organic farming"],a:1,e:"Industrialization and urbanization involve large-scale resource extraction, pollution, and habitat destruction."},
-  {t:"Human–Environment Relationship",q:"The concept of 'carrying capacity' refers to:",o:["How much cargo a ship can hold","The maximum population an environment can sustain indefinitely","The speed of environmental change","Government population targets"],a:1,e:"Carrying capacity is the maximum number of organisms an environment can support without degradation."},
+// HUMAN-ENVIRONMENT RELATIONSHIP
+{t:"Human–Environment Relationship",q:"'Environment as an asset' means:",o:["Environment has no value","Environment provides valuable resources and services","Only forests have value","Environment is a liability"],a:1,e:"Viewing environment as an asset recognizes its valuable resources and ecosystem services."},
+{t:"Human–Environment Relationship",q:"Which is an ecosystem service?",o:["Industrial pollution","Water purification by wetlands","Deforestation","Overfishing"],a:1,e:"Wetlands naturally filter water — a classic ecosystem service."},
+{t:"Human–Environment Relationship",q:"Deforestation primarily leads to:",o:["Increased biodiversity","Soil erosion, habitat loss, and climate change","Better air quality","More rainfall"],a:1,e:"Removing forests causes erosion, destroys habitats, and releases stored carbon."},
+{t:"Human–Environment Relationship",q:"Which activity contributes MOST to environmental degradation?",o:["Planting trees","Industrialization and urbanization","Wildlife conservation","Organic farming"],a:1,e:"Industrialization involves large-scale resource extraction, pollution, and habitat destruction."},
+{t:"Human–Environment Relationship",q:"'Carrying capacity' refers to:",o:["Cargo capacity","Maximum population an environment can sustain","Speed of change","Government targets"],a:1,e:"Carrying capacity is the maximum organisms an environment supports without degradation."},
+{t:"Human–Environment Relationship",q:"Environmental determinism argues that:",o:["Humans fully control nature","Physical environment shapes human societies","Culture has no link to environment","Technology eliminates environmental influence"],a:1,e:"Environmental determinism holds that climate and terrain largely determine how societies develop."},
+{t:"Human–Environment Relationship",q:"Environmental possibilism suggests that:",o:["Environment completely controls humans","Humans can adapt to and modify their environment","Nature cannot be changed","Technology is irrelevant"],a:1,e:"Possibilism argues humans have agency to adapt and innovate within environmental constraints."},
+{t:"Human–Environment Relationship",q:"Ecosystem services are classified into all EXCEPT:",o:["Provisioning services","Regulating services","Cultural services","Manufacturing services"],a:3,e:"The four categories are provisioning, regulating, cultural, and supporting services."},
+{t:"Human–Environment Relationship",q:"An example of a provisioning service is:",o:["Climate regulation","Food and fresh water","Spiritual value","Nutrient cycling"],a:1,e:"Provisioning services are the products obtained from ecosystems — food, water, timber, fiber."},
 
-  // TOPIC 3: Global Climate Change
-  {t:"Global Climate Change",q:"Greenhouse gases include all EXCEPT:",o:["Carbon dioxide (CO₂)","Methane (CH₄)","Nitrogen (N₂)","Nitrous oxide (N₂O)"],a:2,e:"Nitrogen (N₂) makes up about 78% of the atmosphere but is NOT a greenhouse gas. CO₂, CH₄, and N₂O are."},
-  {t:"Global Climate Change",q:"The greenhouse effect is:",o:["Always harmful to the planet","The trapping of heat in Earth's atmosphere by certain gases","A type of farming technique","Caused only by human activities"],a:1,e:"The greenhouse effect is the natural process where atmospheric gases trap heat. Without it, Earth would be too cold for life. Human activities intensify it."},
-  {t:"Global Climate Change",q:"Which international agreement aimed to reduce greenhouse gas emissions with binding targets?",o:["The Kyoto Protocol","The Geneva Convention","The Treaty of Versailles","The Warsaw Pact"],a:0,e:"The Kyoto Protocol (1997) set binding emission reduction targets for industrialized nations."},
-  {t:"Global Climate Change",q:"The Paris Agreement of 2015 aims to:",o:["Eliminate all fossil fuels immediately","Limit global warming to well below 2°C above pre-industrial levels","Ban all industrial activity","Focus only on developed countries"],a:1,e:"The Paris Agreement aims to keep global temperature rise well below 2°C, pursuing efforts for 1.5°C."},
-  {t:"Global Climate Change",q:"Which sector is the LARGEST contributor to global greenhouse gas emissions?",o:["Agriculture","Transportation","Energy production (electricity and heat)","Waste management"],a:2,e:"Energy production — burning fossil fuels for electricity and heat — is the single largest source of global emissions."},
-  {t:"Global Climate Change",q:"The IPCC stands for:",o:["International Panel on Carbon Control","Intergovernmental Panel on Climate Change","International Programme for Climate Cooperation","Intergovernmental Policy on Carbon Capture"],a:1,e:"The Intergovernmental Panel on Climate Change (IPCC) is the UN body that assesses climate science."},
-  {t:"Global Climate Change",q:"Global warming refers specifically to:",o:["The rise in Earth's average surface temperature","Seasonal temperature changes","The ozone hole","Volcanic heating"],a:0,e:"Global warming specifically means the long-term increase in Earth's average surface temperature due to rising greenhouse gas concentrations."},
+// GLOBAL CLIMATE CHANGE
+{t:"Global Climate Change",q:"Greenhouse gases include all EXCEPT:",o:["CO₂","Methane","Nitrogen (N₂)","Nitrous oxide"],a:2,e:"N₂ makes up 78% of atmosphere but is NOT a greenhouse gas."},
+{t:"Global Climate Change",q:"The greenhouse effect is:",o:["Always harmful","Trapping of heat by atmospheric gases","A farming technique","Caused only by humans"],a:1,e:"The greenhouse effect is natural and essential. Human activities intensify it."},
+{t:"Global Climate Change",q:"The Kyoto Protocol aimed to:",o:["Reduce greenhouse emissions with binding targets","Promote free trade","End world hunger","Explore space"],a:0,e:"The Kyoto Protocol (1997) set binding emission reduction targets."},
+{t:"Global Climate Change",q:"The Paris Agreement aims to:",o:["Eliminate all fossil fuels immediately","Limit warming to well below 2°C","Ban all industry","Focus only on rich countries"],a:1,e:"The Paris Agreement targets well below 2°C, pursuing 1.5°C."},
+{t:"Global Climate Change",q:"The LARGEST contributor to global emissions is:",o:["Agriculture","Transportation","Energy production","Waste management"],a:2,e:"Burning fossil fuels for electricity and heat is the single largest emissions source."},
+{t:"Global Climate Change",q:"IPCC stands for:",o:["International Panel on Carbon Control","Intergovernmental Panel on Climate Change","International Programme for Climate Cooperation","Intergovernmental Policy on Carbon Capture"],a:1,e:"The IPCC is the UN body assessing climate science."},
+{t:"Global Climate Change",q:"Global warming refers to:",o:["Rise in Earth's average surface temperature","Seasonal changes","The ozone hole","Volcanic heating"],a:0,e:"Global warming is the long-term increase in Earth's average surface temperature."},
+{t:"Global Climate Change",q:"Ozone depletion is caused mainly by:",o:["CO₂","CFCs","Methane","Water vapor"],a:1,e:"CFCs release chlorine that destroys ozone molecules."},
+{t:"Global Climate Change",q:"Acid rain is caused by:",o:["CO₂ and methane","SO₂ and nitrogen oxides","Oxygen and hydrogen","CFCs"],a:1,e:"SO₂ and NOₓ react with water vapor to form acids."},
+{t:"Global Climate Change",q:"Which gas contributes most to warming?",o:["Oxygen","Nitrogen","Carbon dioxide","Helium"],a:2,e:"CO₂ is the dominant greenhouse gas from human activities."},
+{t:"Global Climate Change",q:"Global warming causes:",o:["Temperature decrease","Sea level rise","Freezing oceans","Less rainfall"],a:1,e:"Warming causes thermal expansion and ice melting, raising sea levels."},
+{t:"Global Climate Change",q:"Climate change is:",o:["Short-term weather","Long-term change in climate patterns","Daily temperature change","Wind movement"],a:1,e:"Climate change involves sustained shifts over decades or longer."},
+{t:"Global Climate Change",q:"Burning fossil fuels releases:",o:["Nitrogen","Oxygen","Carbon dioxide","Hydrogen"],a:2,e:"Combustion releases CO₂ as carbon combines with oxygen."},
+{t:"Global Climate Change",q:"The Paris Agreement was signed in:",o:["2015","1992","1987","2000"],a:0,e:"Adopted December 2015 at COP21."},
+{t:"Global Climate Change",q:"Climate resilience is:",o:["Ability to recover from climate impacts","Ignoring climate change","Increasing pollution","Destroying forests"],a:0,e:"Resilience is the capacity to absorb and recover from climate shocks."},
+{t:"Global Climate Change",q:"Climate adaptation means:",o:["Adjusting to climate effects","Ignoring climate change","Increasing pollution","Destroying forests"],a:0,e:"Adaptation adjusts practices to moderate climate damage."},
+{t:"Global Climate Change",q:"Climate mitigation means:",o:["Reducing emissions","Increasing pollution","Destroying forests","Ignoring climate change"],a:0,e:"Mitigation reduces emissions to limit future climate change."},
+{t:"Global Climate Change",q:"The Montreal Protocol addressed:",o:["Climate change","Ozone-depleting substances","Biodiversity","Deforestation"],a:1,e:"It successfully phased out CFCs and other ozone-depleting substances."},
+{t:"Global Climate Change",q:"A carbon sink is:",o:["CO₂ emission source","A reservoir absorbing more carbon than it releases","A type of pollution","An industrial process"],a:1,e:"Forests, oceans, and soil absorb CO₂ from the atmosphere."},
+{t:"Global Climate Change",q:"The enhanced greenhouse effect is:",o:["Natural greenhouse effect","Intensification due to human activities","Cooling of the planet","Ozone formation"],a:1,e:"The additional warming caused by human-produced greenhouse gases."},
+{t:"Global Climate Change",q:"Sea level rise is caused by:",o:["Thermal expansion and melting ice","Increased evaporation only","Volcanic activity","Reduced rainfall"],a:0,e:"Warming oceans expand and melting ice adds water, both raising sea levels."},
+{t:"Global Climate Change",q:"COP in climate negotiations stands for:",o:["Conference of the Parties","Committee on Pollution","Council of Parliaments","Charter of Principles"],a:0,e:"COP is the Conference of the Parties — the decision-making body of the UNFCCC."},
+{t:"Global Climate Change",q:"Methane is a particularly potent greenhouse gas because:",o:["It's the most abundant","It traps much more heat per molecule than CO₂","It destroys ozone","It's only from human activities"],a:1,e:"Methane has about 80x the warming potential of CO₂ over 20 years, though it's less abundant."},
 
-  // TOPIC 4: Natural Resources
-  {t:"Natural Resources",q:"Which of the following is a non-renewable resource?",o:["Solar energy","Timber","Crude oil","Wind"],a:2,e:"Crude oil takes millions of years to form and is consumed much faster than it regenerates — making it non-renewable."},
-  {t:"Natural Resources",q:"Renewable resources are those that:",o:["Can never be depleted","Can be replenished naturally within a human timescale","Are only found underground","Are man-made"],a:1,e:"Renewable resources like forests, fish, and solar energy can regenerate or be replenished within a reasonable timeframe."},
-  {t:"Natural Resources",q:"Which is an example of a renewable resource?",o:["Natural gas","Coal","Wind energy","Petroleum"],a:2,e:"Wind energy is naturally and continuously available and does not deplete with use."},
-  {t:"Natural Resources",q:"Conservation of natural resources means:",o:["Never using any natural resources","Using resources wisely to ensure availability for future generations","Exploiting resources as fast as possible","Importing all resources from abroad"],a:1,e:"Conservation balances current use with preservation so resources remain available for future generations."},
-  {t:"Natural Resources",q:"Minerals such as gold, iron, and copper are classified as:",o:["Renewable resources","Non-renewable resources","Inexhaustible resources","Biological resources"],a:1,e:"Minerals form over geological timescales and cannot be replenished once extracted — they are non-renewable."},
-  {t:"Natural Resources",q:"Which practice helps conserve water resources?",o:["Dumping waste in rivers","Drip irrigation","Excessive dam construction only","Deforestation"],a:1,e:"Drip irrigation delivers water directly to plant roots, minimizing waste and conserving water resources."},
+// ENVIRONMENTAL ISSUES
+{t:"Environmental Issues",q:"Environmental pollution is:",o:["Improving the environment","Contaminating the environment","Conserving nature","Protecting wildlife"],a:1,e:"Pollution introduces harmful contaminants into the natural environment."},
+{t:"Environmental Issues",q:"Air pollution is mainly caused by:",o:["Trees","Vehicles and industries","Rivers","Rain"],a:1,e:"Vehicle exhaust and industrial emissions are primary air pollution sources."},
+{t:"Environmental Issues",q:"Which causes soil erosion?",o:["Planting trees","Overgrazing","Conservation","Irrigation"],a:1,e:"Overgrazing removes vegetation, exposing soil to erosion."},
+{t:"Environmental Issues",q:"Noise pollution mainly occurs in:",o:["Quiet villages","Industrial cities","Forests","Farms"],a:1,e:"Cities have concentrated noise from factories, traffic, and construction."},
+{t:"Environmental Issues",q:"Water pollution can be caused by:",o:["Industrial waste","Rainwater","Sunlight","Wind"],a:0,e:"Industrial effluents with chemicals are a major water contamination source."},
+{t:"Environmental Issues",q:"Land degradation is:",o:["Soil improvement","Decline in land quality","Vegetation increase","Soil conservation"],a:1,e:"Land degradation is deterioration through erosion, nutrient loss, and contamination."},
+{t:"Environmental Issues",q:"Urbanization is:",o:["Moving to rural areas","Growth of cities","Population reduction","Forest increase"],a:1,e:"Urbanization concentrates people in cities."},
+{t:"Environmental Issues",q:"Flooding can be caused by:",o:["Climate change","Soil conservation","Reduced rainfall","Reforestation"],a:0,e:"Climate change intensifies rainfall and raises sea levels, increasing floods."},
+{t:"Environmental Issues",q:"Soil fertility is:",o:["Soil dryness","Soil pollution","Ability to support plant growth","Soil erosion"],a:2,e:"Fertility depends on nutrient content and organic matter."},
+{t:"Environmental Issues",q:"Pollution prevention is:",o:["Controlling pollution before it occurs","Increasing waste","Burning waste","Ignoring pollution"],a:0,e:"Prevention eliminates pollution at its source."},
+{t:"Environmental Issues",q:"Eutrophication is caused by:",o:["Excess nutrients (nitrogen, phosphorus)","Reduced sunlight","Cold temperatures","Clean water"],a:0,e:"Excess nutrients cause algal blooms that deplete oxygen."},
+{t:"Environmental Issues",q:"E-waste refers to:",o:["Energy waste","Discarded electronics","Emissions waste","Environmental waste"],a:1,e:"E-waste includes discarded computers, phones, and electronics."},
+{t:"Environmental Issues",q:"'Smog' combines:",o:["Smoke and fog","Sun and moisture","Soil and gas","Steam and oxygen"],a:0,e:"Smog = smoke + fog, describing hazy urban air pollution."},
+{t:"Environmental Issues",q:"Bioaccumulation is:",o:["Buildup of substances in an organism over time","Rapid decomposition","Soil formation","Water purification"],a:0,e:"Organisms absorb toxins faster than they eliminate them, increasing concentrations."},
+{t:"Environmental Issues",q:"Thermal pollution is caused by:",o:["Discharge of heated water into natural water bodies","Cold air currents","Excessive rainfall","Solar radiation"],a:0,e:"Power plants and factories often discharge heated water, raising temperatures in lakes and rivers and harming aquatic life."},
+{t:"Environmental Issues",q:"The 'heat island' effect refers to:",o:["Islands with volcanic activity","Urban areas being significantly warmer than surrounding rural areas","Tropical island climate","Heat from underground sources"],a:1,e:"Urban heat islands result from concrete, asphalt, and reduced vegetation absorbing and retaining heat."},
 
-  // TOPIC 5: Sustainable Development — History & Concepts
-  {t:"Sustainable Development",q:"The Brundtland Report (1987) defined sustainable development as:",o:["Maximizing economic growth at any cost","Development that meets present needs without compromising future generations' ability to meet theirs","Stopping all industrial activity","Development focused only on environmental protection"],a:1,e:"The Brundtland Commission's 'Our Common Future' (1987) gave the most widely cited definition of sustainable development."},
-  {t:"Sustainable Development",q:"The Brundtland Commission was also known as:",o:["The Club of Rome","The World Commission on Environment and Development (WCED)","The United Nations General Assembly","The World Trade Organization"],a:1,e:"The WCED, chaired by Gro Harlem Brundtland, produced 'Our Common Future' in 1987."},
-  {t:"Sustainable Development",q:"The three pillars of sustainable development are:",o:["Political, military, and cultural","Economic, social, and environmental","Legal, financial, and technical","Agricultural, industrial, and commercial"],a:1,e:"Sustainable development rests on three interconnected pillars: economic growth, social inclusion, and environmental protection."},
-  {t:"Sustainable Development",q:"The Earth Summit of 1992 was held in:",o:["New York, USA","Johannesburg, South Africa","Rio de Janeiro, Brazil","Kyoto, Japan"],a:2,e:"The 1992 UN Conference on Environment and Development (Earth Summit) was held in Rio de Janeiro."},
-  {t:"Sustainable Development",q:"'Agenda 21' from the 1992 Earth Summit is:",o:["A military strategy","A comprehensive plan for global sustainable development action","A trade agreement","A space exploration program"],a:1,e:"Agenda 21 is a non-binding action plan adopted at Rio, covering sustainable development strategies for the 21st century."},
-  {t:"Sustainable Development",q:"The Club of Rome's 1972 report was titled:",o:["Our Common Future","Silent Spring","The Limits to Growth","An Inconvenient Truth"],a:2,e:"'The Limits to Growth' (1972) used computer modeling to warn about the consequences of unchecked growth on finite resources."},
-  {t:"Sustainable Development",q:"A key criticism of sustainable development is that:",o:["It is too precisely defined","It can be vague and mean different things to different people","It only applies to Africa","It ignores economic growth entirely"],a:1,e:"Critics argue the concept is ambiguous and elastic — used by different groups to justify very different agendas."},
+// NATURAL RESOURCES
+{t:"Natural Resources",q:"Which is a non-renewable resource?",o:["Solar energy","Timber","Crude oil","Wind"],a:2,e:"Crude oil takes millions of years to form."},
+{t:"Natural Resources",q:"Renewable resources can be:",o:["Never depleted","Replenished within a human timescale","Only underground","Man-made"],a:1,e:"Renewable resources regenerate within a reasonable timeframe."},
+{t:"Natural Resources",q:"Which is renewable?",o:["Natural gas","Coal","Wind energy","Petroleum"],a:2,e:"Wind energy is continuously available."},
+{t:"Natural Resources",q:"Conservation means:",o:["Never using resources","Using resources wisely for future availability","Exploiting resources fast","Importing everything"],a:1,e:"Conservation balances use with preservation."},
+{t:"Natural Resources",q:"Gold, iron, and copper are:",o:["Renewable","Non-renewable","Inexhaustible","Biological"],a:1,e:"Minerals form over geological timescales and can't be replenished."},
+{t:"Natural Resources",q:"Which conserves water?",o:["Dumping waste in rivers","Drip irrigation","Excessive dams","Deforestation"],a:1,e:"Drip irrigation delivers water directly to roots, minimizing waste."},
+{t:"Natural Resources",q:"Natural resources include:",o:["Only minerals","Only water","Only forests","All — minerals, water, and forests"],a:3,e:"Natural resources encompass all materials and energy from nature."},
+{t:"Natural Resources",q:"Fossil fuels formed from:",o:["Volcanic eruptions","Ancient organism remains over millions of years","Ocean currents","Solar radiation"],a:1,e:"Fossil fuels come from buried plant/animal remains under heat and pressure."},
+{t:"Natural Resources",q:"Sustainable resource management includes:",o:["Clear-cutting forests","Rotational farming and selective logging","Ocean dumping","Overfishing"],a:1,e:"These practices allow ecosystems to regenerate."},
+{t:"Natural Resources",q:"Desertification is:",o:["Creating deserts for tourism","Land degradation in dry areas","A type of irrigation","Planting desert plants"],a:1,e:"Fertile land becomes increasingly arid due to overuse and drought."},
+{t:"Natural Resources",q:"Geothermal energy comes from:",o:["The sun","Wind","Heat within the Earth","Ocean tides"],a:2,e:"Geothermal harnesses Earth's interior heat."},
+{t:"Natural Resources",q:"Biomass energy derives from:",o:["Fossil fuels","Organic materials like wood and crops","Nuclear reactions","Solar panels"],a:1,e:"Biomass uses organic materials as fuel."},
+{t:"Natural Resources",q:"The 'resource curse' refers to:",o:["Resource-rich countries having poor outcomes","Resources being expensive","Mineral shortage","Too many renewables"],a:0,e:"Resource-rich countries often suffer corruption, conflict, and poor governance."},
+{t:"Natural Resources",q:"Hydroelectric power generates electricity from:",o:["Burning coal","Flowing or falling water","Nuclear fission","Wind turbines"],a:1,e:"Hydropower converts the kinetic energy of moving water into electricity using turbines."},
+{t:"Natural Resources",q:"Peak oil theory suggests that:",o:["Oil will last forever","Global oil production will eventually reach a maximum and decline","Oil prices always decrease","New oil reserves are unlimited"],a:1,e:"Peak oil predicts that total oil extraction will hit a peak then irreversibly decline as reserves deplete."},
 
-  // TOPIC 6: MDGs and SDGs
-  {t:"MDGs & SDGs",q:"The Millennium Development Goals (MDGs) were adopted in:",o:["1992","2000","2010","2015"],a:1,e:"The MDGs were adopted by world leaders at the UN Millennium Summit in September 2000."},
-  {t:"MDGs & SDGs",q:"How many Millennium Development Goals were there?",o:["5","8","12","17"],a:1,e:"There were 8 MDGs targeting issues like poverty, education, health, and environmental sustainability."},
-  {t:"MDGs & SDGs",q:"The Sustainable Development Goals (SDGs) were adopted in:",o:["2000","2010","2012","2015"],a:3,e:"The 17 SDGs were adopted in September 2015 as part of the 2030 Agenda for Sustainable Development."},
-  {t:"MDGs & SDGs",q:"How many Sustainable Development Goals (SDGs) are there?",o:["8","12","15","17"],a:3,e:"There are 17 SDGs covering a broader range of issues than the MDGs, including inequality, climate, and peace."},
-  {t:"MDGs & SDGs",q:"A major difference between MDGs and SDGs is that:",o:["MDGs had more goals","SDGs apply to ALL countries, not just developing ones","SDGs focus only on health","MDGs included climate change goals"],a:1,e:"Unlike the MDGs which targeted developing countries, the SDGs are universal — applying to every nation."},
-  {t:"MDGs & SDGs",q:"SDG 1 focuses on:",o:["Quality education","No poverty","Clean water","Climate action"],a:1,e:"SDG 1 aims to end poverty in all its forms everywhere by 2030."},
-  {t:"MDGs & SDGs",q:"SDG 13 addresses:",o:["Life below water","Reduced inequalities","Climate action","Decent work"],a:2,e:"SDG 13 calls for urgent action to combat climate change and its impacts."},
-  {t:"MDGs & SDGs",q:"Which of the following was NOT an MDG?",o:["Eradicate extreme poverty and hunger","Achieve universal primary education","Reduce inequality within and among countries","Combat HIV/AIDS, malaria, and other diseases"],a:2,e:"Reducing inequality was introduced as SDG 10. The MDGs focused more narrowly on poverty, health, and education."},
+// SUSTAINABLE DEVELOPMENT
+{t:"Sustainable Development",q:"The Brundtland Report defined sustainable development as:",o:["Maximizing growth at any cost","Meeting present needs without compromising future generations","Stopping all industry","Only environmental protection"],a:1,e:"'Our Common Future' (1987) gave the most cited definition."},
+{t:"Sustainable Development",q:"The WCED was also known as:",o:["Club of Rome","Brundtland Commission","UN General Assembly","WTO"],a:1,e:"The WCED was chaired by Gro Harlem Brundtland."},
+{t:"Sustainable Development",q:"The three pillars of sustainability are:",o:["Political, military, cultural","Economic, social, environmental","Legal, financial, technical","Agricultural, industrial, commercial"],a:1,e:"Economic growth, social inclusion, and environmental protection."},
+{t:"Sustainable Development",q:"The 1992 Earth Summit was in:",o:["Tokyo","Johannesburg","Rio de Janeiro","Kyoto"],a:2,e:"Held in Rio de Janeiro, Brazil."},
+{t:"Sustainable Development",q:"Agenda 21 is:",o:["Military strategy","Comprehensive plan for sustainable development","Trade agreement","Space program"],a:1,e:"A non-binding action plan for sustainable development in the 21st century."},
+{t:"Sustainable Development",q:"The Club of Rome's 1972 report was:",o:["Our Common Future","Silent Spring","The Limits to Growth","An Inconvenient Truth"],a:2,e:"Warned about unchecked growth on finite resources."},
+{t:"Sustainable Development",q:"A criticism of sustainable development is:",o:["It's too precise","It can be vague and mean different things","It only applies to Africa","It ignores growth entirely"],a:1,e:"Critics call the concept ambiguous."},
+{t:"Sustainable Development",q:"Intergenerational equity means:",o:["Only current generation matters","Future generations deserve equal resources","Use everything now","Equity within one generation only"],a:1,e:"We must not compromise future generations' access to resources."},
+{t:"Sustainable Development",q:"Which is NOT a sustainability principle?",o:["Polluter pays","Precautionary principle","Maximum exploitation","Intergenerational equity"],a:2,e:"Maximum exploitation contradicts sustainability."},
+{t:"Sustainable Development",q:"Rio+20 (2012) produced:",o:["Our Common Future","Limits to Growth","The Future We Want","Silent Spring"],a:2,e:"Renewed commitment to sustainable development."},
+{t:"Sustainable Development",q:"Brundtland Report year:",o:["1972","1987","1992","2000"],a:1,e:"Published in 1987."},
+{t:"Sustainable Development",q:"Earth Summit year:",o:["1987","1992","2000","2005"],a:1,e:"Held in 1992."},
+{t:"Sustainable Development",q:"Carbon footprint is:",o:["Carbon emissions from activities","Footprints in soil","Plant growth","Soil erosion"],a:0,e:"Total greenhouse gas emissions from your activities."},
+{t:"Sustainable Development",q:"Ecological footprint measures:",o:["Human demand on nature","Soil fertility","Plant growth","Animal population"],a:0,e:"How much productive land is needed to support consumption."},
+{t:"Sustainable Development",q:"Resource depletion occurs when:",o:["Use exceeds replacement","Resources increase","Conservation occurs","Recycling occurs"],a:0,e:"Extraction exceeding regeneration."},
+{t:"Sustainable Development",q:"Green economy promotes:",o:["Eco-friendly development","Pollution increase","Resource destruction","Industrial pollution"],a:0,e:"Growth with reduced environmental risks."},
+{t:"Sustainable Development",q:"CSR means:",o:["Profit at any cost","Companies responsible for social/environmental impact","Ignoring stakeholders","Tax avoidance"],a:1,e:"Businesses integrate social and environmental concerns."},
+{t:"Sustainable Development",q:"Green GDP attempts to:",o:["Ignore environmental costs","Account for environmental degradation in national income","Only measure industry","Replace GDP"],a:1,e:"Adjusts GDP by subtracting environmental degradation costs."},
+{t:"Sustainable Development",q:"'Cradle to cradle' design means:",o:["Single-use products","All materials recyclable or compostable indefinitely","Only for children","Temporary design"],a:1,e:"Eliminates waste by keeping materials in continuous production cycles."},
+{t:"Sustainable Development",q:"The Stockholm Conference (1972) was:",o:["First major UN environmental conference","Created the SDGs","Banned fossil fuels","Focused only on trade"],a:0,e:"First global environmental conference; led to UNEP's creation."},
+{t:"Sustainable Development",q:"Johannesburg Summit was in:",o:["1992","2002","2012","2015"],a:1,e:"World Summit on Sustainable Development, 2002."},
+{t:"Sustainable Development",q:"Sustainable agriculture promotes:",o:["Long-term farming without environmental harm","Chemical overuse","Deforestation","Soil degradation"],a:0,e:"Meets food needs while preserving resources."},
+{t:"Sustainable Development",q:"Energy efficiency means:",o:["Less energy for the same task","Wasting energy","More consumption","Ignoring energy use"],a:0,e:"Same output with less energy input."},
+{t:"Sustainable Development",q:"The 'triple bottom line' evaluates:",o:["Only profit","Profit, people, and planet","Revenue and taxes","Import and export"],a:1,e:"Success across economic, social, and environmental dimensions."},
 
-  // TOPIC 7: Population & Economic Sustainability
-  {t:"Population & Economic Growth",q:"Rapid population growth can threaten sustainability by:",o:["Reducing demand for resources","Increasing pressure on natural resources and services","Having no effect on the environment","Automatically improving economic output"],a:1,e:"More people means greater demand for food, water, energy, and land — straining the environment."},
-  {t:"Population & Economic Growth",q:"Economic sustainability in development theory emphasizes:",o:["Unlimited GDP growth regardless of consequences","Maintaining economic output without depleting the resource base","Ignoring environmental costs","Focusing only on short-term profits"],a:1,e:"Economic sustainability means generating wealth in ways that do not degrade the natural or social capital on which the economy depends."},
-  {t:"Population & Economic Growth",q:"The concept of 'weak sustainability' holds that:",o:["Natural capital cannot be substituted","Man-made capital can substitute for natural capital","No economic growth is allowed","Only renewable energy should be used"],a:1,e:"Weak sustainability assumes that human-made capital (technology, infrastructure) can replace depleted natural capital."},
-  {t:"Population & Economic Growth",q:"'Strong sustainability' argues that:",o:["Natural capital and human capital are perfectly interchangeable","Critical natural capital cannot be substituted and must be preserved","Economic growth is impossible","Technology alone can solve all problems"],a:1,e:"Strong sustainability insists some natural assets (like the ozone layer, biodiversity) are irreplaceable and must be maintained."},
-  {t:"Population & Economic Growth",q:"Herman Daly is associated with the concept of:",o:["Unlimited growth economics","Steady-state economics","Trickle-down economics","Supply-side economics"],a:1,e:"Herman Daly advocated for a steady-state economy — one with stable throughput of materials and energy at sustainable levels."},
+// IPAT CONCEPT
+{t:"IPAT Concept",q:"IPAT explains:",o:["Environmental impact","Population growth only","Economic development only","Agricultural production"],a:0,e:"Impact = Population × Affluence × Technology."},
+{t:"IPAT Concept",q:"The IPAT equation is:",o:["I = P + A + T","I = P × A × T","I = P – A – T","I = P / A / T"],a:1,e:"Multiplicative relationship between factors."},
+{t:"IPAT Concept",q:"In IPAT, I stands for:",o:["Income","Industry","Impact","Investment"],a:2,e:"I = environmental Impact."},
+{t:"IPAT Concept",q:"P stands for:",o:["Production","Pollution","Policy","Population"],a:3,e:"P = Population."},
+{t:"IPAT Concept",q:"A stands for:",o:["Agriculture","Affluence","Atmosphere","Adaptation"],a:1,e:"A = Affluence (consumption per capita)."},
+{t:"IPAT Concept",q:"T stands for:",o:["Territory","Trade","Technology","Taxation"],a:2,e:"T = Technology (impact per unit of consumption)."},
+{t:"IPAT Concept",q:"Reducing impact requires:",o:["Only reducing population","Only improving technology","Addressing all three factors together","Increasing affluence"],a:2,e:"All three factors multiply — meaningful reduction addresses all."},
 
-  // TOPIC 8: Theoretical Perspectives
-  {t:"Theoretical Perspectives",q:"Urban sustainability focuses on:",o:["Only rural development","Making cities economically, socially, and environmentally viable long-term","Eliminating all cities","Reducing urban population to zero"],a:1,e:"Urban sustainability aims to create cities that balance economic vitality, social equity, and environmental health."},
-  {t:"Theoretical Perspectives",q:"The 'triple bottom line' refers to evaluating performance based on:",o:["Only profit","Profit, people, and planet","Revenue, expenses, and taxes","Import, export, and GDP"],a:1,e:"The triple bottom line framework evaluates organizational success across three dimensions: economic (profit), social (people), and environmental (planet)."},
-  {t:"Theoretical Perspectives",q:"Ecological economics differs from mainstream economics by:",o:["Ignoring the economy","Treating the economy as a subsystem of the larger ecosystem","Focusing only on trade","Rejecting all technology"],a:1,e:"Ecological economics sees the economy as embedded within the biosphere, subject to ecological limits."},
-  {t:"Theoretical Perspectives",q:"'Natural capital' refers to:",o:["Money earned from farming","The world's stock of natural resources and ecosystem services","Only mineral deposits","Government environmental spending"],a:1,e:"Natural capital includes all natural assets — forests, water, soil, minerals, biodiversity — and the services they provide."},
+// MDGs & SDGs
+{t:"MDGs & SDGs",q:"MDGs were adopted in:",o:["1992","2000","2010","2015"],a:1,e:"Adopted at the UN Millennium Summit in 2000."},
+{t:"MDGs & SDGs",q:"How many MDGs?",o:["5","8","12","17"],a:1,e:"8 MDGs."},
+{t:"MDGs & SDGs",q:"SDGs were adopted in:",o:["2000","2010","2012","2015"],a:3,e:"Adopted September 2015."},
+{t:"MDGs & SDGs",q:"How many SDGs?",o:["8","12","15","17"],a:3,e:"17 SDGs."},
+{t:"MDGs & SDGs",q:"Key MDG vs SDG difference:",o:["MDGs had more goals","SDGs apply to ALL countries","SDGs focus only on health","MDGs included climate"],a:1,e:"SDGs are universal — applying to every nation."},
+{t:"MDGs & SDGs",q:"SDG 1:",o:["Quality education","No poverty","Clean water","Climate action"],a:1,e:"End poverty in all forms."},
+{t:"MDGs & SDGs",q:"SDG 2:",o:["No poverty","Zero hunger","Good health","Quality education"],a:1,e:"End hunger, achieve food security."},
+{t:"MDGs & SDGs",q:"SDG 3:",o:["Quality education","No poverty","Good health and well-being","Zero hunger"],a:2,e:"Ensure healthy lives and well-being."},
+{t:"MDGs & SDGs",q:"SDG 4:",o:["Clean water","Quality education","Good health","Zero hunger"],a:1,e:"Inclusive and equitable quality education."},
+{t:"MDGs & SDGs",q:"SDG 5:",o:["Clean energy","Gender equality","Decent work","Reduced inequalities"],a:1,e:"Gender equality and women's empowerment."},
+{t:"MDGs & SDGs",q:"SDG 6:",o:["Affordable energy","Clean water and sanitation","Life on land","Reduced inequalities"],a:1,e:"Water and sanitation for all."},
+{t:"MDGs & SDGs",q:"SDG 7:",o:["Zero hunger","Affordable and clean energy","Gender equality","Life on land"],a:1,e:"Affordable, reliable, sustainable energy."},
+{t:"MDGs & SDGs",q:"SDG 11:",o:["Sustainable cities and communities","Industry and innovation","Responsible consumption","Peace and justice"],a:0,e:"Inclusive, safe, resilient cities."},
+{t:"MDGs & SDGs",q:"SDG 13:",o:["Life below water","Reduced inequalities","Climate action","Decent work"],a:2,e:"Urgent action on climate change."},
+{t:"MDGs & SDGs",q:"SDG 14:",o:["Life on land","Life below water","Climate action","Partnerships"],a:1,e:"Conserve and sustainably use oceans."},
+{t:"MDGs & SDGs",q:"SDG 15:",o:["Life below water","Peace and justice","Life on land","Partnerships"],a:2,e:"Protect terrestrial ecosystems."},
+{t:"MDGs & SDGs",q:"SDG targets total approximately:",o:["17","100","169","200"],a:2,e:"169 specific targets under 17 goals."},
+{t:"MDGs & SDGs",q:"Major MDG achievement:",o:["Halved extreme poverty","Eliminated all disease","Universal secondary education","Stopped climate change"],a:0,e:"Extreme poverty more than halved 1990–2015."},
+{t:"MDGs & SDGs",q:"SDGs target year:",o:["2020","2025","2030","2050"],a:2,e:"The 2030 Agenda."},
+{t:"MDGs & SDGs",q:"Which was NOT an MDG?",o:["Eradicate extreme poverty","Universal primary education","Reduce inequality within/among countries","Combat HIV/AIDS"],a:2,e:"Reducing inequality was introduced as SDG 10."},
+{t:"MDGs & SDGs",q:"SDG 12 addresses:",o:["Climate action","Life below water","Responsible consumption and production","Quality education"],a:2,e:"SDG 12 aims to ensure sustainable consumption and production patterns."},
+{t:"MDGs & SDGs",q:"SDG 16 focuses on:",o:["Life on land","Peace, justice, and strong institutions","Partnerships","Reduced inequalities"],a:1,e:"SDG 16 promotes peaceful, inclusive societies with access to justice."},
 
-  // TOPIC 9: Bio-economy
-  {t:"Bio-economy",q:"Bio-economy is best defined as:",o:["An economy based solely on oil","An economy that uses biological resources, processes, and principles for sustainable production","An economy without any technology","An economy focused only on medicine"],a:1,e:"The bio-economy leverages renewable biological resources and bio-based processes across sectors for sustainability."},
-  {t:"Bio-economy",q:"Bio-economy as 'green economy' emphasizes:",o:["Maximizing fossil fuel use","Economic growth that reduces environmental risks and ecological scarcities","Ignoring social equity","Only agricultural activities"],a:1,e:"The green economy framing focuses on growth that is low-carbon, resource-efficient, and socially inclusive."},
-  {t:"Bio-economy",q:"Which of these is a principle of bio-economy?",o:["Unlimited extraction of resources","Sustainable use of biological resources","Dependence on fossil fuels","Ignoring innovation"],a:1,e:"A core principle of bio-economy is the sustainable and efficient use of biological resources and waste streams."},
-  {t:"Bio-economy",q:"Georgescu-Roegen's bio-economics relates economic processes to:",o:["Only market prices","The laws of thermodynamics and biological principles","Political party platforms","Military strategy"],a:1,e:"Georgescu-Roegen grounded economics in thermodynamics, arguing that entropy limits economic processes."},
-  {t:"Bio-economy",q:"Bio-economy as a strategy involves:",o:["Abandoning all modern technology","Using biotechnology and innovation to replace fossil-based inputs","Only traditional farming","Reducing all economic activity"],a:1,e:"Bio-economy strategies promote innovation in biotechnology, renewable materials, and bio-based industries."},
+// POPULATION & ECONOMIC GROWTH
+{t:"Population & Economic Growth",q:"Rapid population growth threatens sustainability by:",o:["Reducing demand","Increasing pressure on resources","Having no effect","Improving output"],a:1,e:"More people = greater demand on food, water, energy, and land."},
+{t:"Population & Economic Growth",q:"Economic sustainability emphasizes:",o:["Unlimited GDP growth","Maintaining output without depleting resources","Ignoring environment","Short-term profits"],a:1,e:"Generating wealth without degrading natural capital."},
+{t:"Population & Economic Growth",q:"Weak sustainability holds:",o:["Natural capital can't be substituted","Man-made capital can substitute natural capital","No growth allowed","Only renewables"],a:1,e:"Assumes human capital can replace natural capital."},
+{t:"Population & Economic Growth",q:"Strong sustainability argues:",o:["All capital is interchangeable","Critical natural capital is irreplaceable","Growth is impossible","Technology solves everything"],a:1,e:"Some natural assets are irreplaceable."},
+{t:"Population & Economic Growth",q:"Herman Daly advocates:",o:["Unlimited growth","Steady-state economics","Trickle-down","Supply-side"],a:1,e:"Stable throughput at sustainable levels."},
+{t:"Population & Economic Growth",q:"Tragedy of the commons describes:",o:["Successful sharing","Overexploitation of shared resources by self-interest","Government reform","A battle"],a:1,e:"Self-interest depletes shared resources."},
+{t:"Population & Economic Growth",q:"Malthus argued:",o:["Resources are unlimited","Population outgrows food supply","Technology fixes everything","Population decreases naturally"],a:1,e:"Population grows geometrically, food arithmetically."},
+{t:"Population & Economic Growth",q:"Demographic transition shows:",o:["Population always grows","Societies move from high to low birth/death rates","Death rates never change","Birth rates stay high"],a:1,e:"Development brings declining birth and death rates."},
+{t:"Population & Economic Growth",q:"Human capital is:",o:["Money in the bank","Skills, knowledge, and health of workforce","Physical infrastructure","Natural resources"],a:1,e:"Education, skills, and health that increase productivity."},
+{t:"Population & Economic Growth",q:"The 'limits to growth' thesis says:",o:["Growth is infinite","Physical limits constrain economic expansion","Only poor countries face limits","Technology eliminates limits"],a:1,e:"Finite resources impose ultimate limits."},
+{t:"Population & Economic Growth",q:"Environmental Kuznets Curve suggests:",o:["Pollution always increases","Degradation rises then falls with income","Rich countries pollute most","Poor countries are always clean"],a:1,e:"Inverted-U relationship between income and degradation."},
 
-  // TOPIC 10: Ecotourism
-  {t:"Ecotourism",q:"Ecotourism is defined as:",o:["Mass tourism to popular beaches","Responsible travel to natural areas that conserves the environment and benefits local people","Luxury hotel tourism","Industrial tourism"],a:1,e:"Ecotourism combines nature conservation, community benefit, and environmental education through responsible travel."},
-  {t:"Ecotourism",q:"A key benefit of ecotourism is:",o:["Increased pollution","Providing income for local communities while preserving nature","Destruction of wildlife habitats","Overcrowding of natural sites"],a:1,e:"Well-managed ecotourism generates revenue for communities and creates economic incentives for conservation."},
-  {t:"Ecotourism",q:"A potential negative impact of ecotourism is:",o:["Too much conservation","Disturbance to wildlife and ecosystems if not properly managed","Excessive community benefit","Too much education"],a:1,e:"Without proper management, even eco-tourists can disturb wildlife, erode trails, and strain local resources."},
-  {t:"Ecotourism",q:"Which principle is central to ecotourism?",o:["Maximizing visitor numbers at all costs","Minimizing environmental impact while educating visitors","Building large resorts in forests","Exploiting natural resources for profit"],a:1,e:"Ecotourism prioritizes minimal environmental footprint and meaningful education about the natural environment."},
-  {t:"Ecotourism",q:"Ecotourism contributes to sustainable development by:",o:["Replacing all other industries","Linking conservation with local economic development","Ignoring local communities","Promoting deforestation"],a:1,e:"Ecotourism bridges conservation goals with economic livelihood, making preservation financially viable for communities."},
+// THEORETICAL PERSPECTIVES
+{t:"Theoretical Perspectives",q:"Urban sustainability focuses on:",o:["Only rural development","Long-term viability of cities","Eliminating cities","Zero urban population"],a:1,e:"Creating cities that balance economy, society, and environment."},
+{t:"Theoretical Perspectives",q:"Ecological economics treats the economy as:",o:["Independent of nature","A subsystem of the ecosystem","Superior to nature","Unrelated to resources"],a:1,e:"Economy embedded within the biosphere, subject to ecological limits."},
+{t:"Theoretical Perspectives",q:"Natural capital is:",o:["Farm income","Stock of natural resources and ecosystem services","Only minerals","Government spending"],a:1,e:"All natural assets and their services."},
+{t:"Theoretical Perspectives",q:"The polluter pays principle:",o:["Government pays","Polluter bears pollution costs","Consumers always pay","Nobody pays"],a:1,e:"Polluters should cover costs of managing their pollution."},
+{t:"Theoretical Perspectives",q:"The precautionary principle:",o:["Act only with full certainty","Don't delay prevention despite uncertainty","Ignore risk","Only address proven harms"],a:1,e:"Take preventive measures even without complete proof."},
+{t:"Theoretical Perspectives",q:"New Urbanism promotes:",o:["Suburban sprawl","Walkable, mixed-use communities","Industrial-only zones","Rural-only development"],a:1,e:"Walkable neighborhoods with diverse land uses."},
+{t:"Theoretical Perspectives",q:"Ahwahnee Principles relate to:",o:["Nuclear policy","Resource-efficient community design","Military strategy","Trade"],a:1,e:"Guidelines for liveable, efficient communities."},
+{t:"Theoretical Perspectives",q:"Circular economy is based on:",o:["Take-make-dispose","Designing out waste and keeping materials in use","Maximizing waste","Linear production"],a:1,e:"Eliminates waste through continuous reuse, repair, and recycling."},
+{t:"Theoretical Perspectives",q:"Environmental justice concerns:",o:["Equal protection regardless of race/income","Only wealthy communities","Industrial profits","Trade"],a:0,e:"No community should bear disproportionate environmental burdens."},
+{t:"Theoretical Perspectives",q:"Ecological modernization theory argues:",o:["Economic growth always harms environment","Economic development and environmental protection can reinforce each other","Industry should be abolished","Only degrowth works"],a:1,e:"This theory suggests that industrial innovation can drive both economic growth and environmental improvement."},
 
-  // TOPIC 11: Additional mixed questions
-  {t:"Environment & Ecosystem",q:"Biodiversity refers to:",o:["Only the number of animals in an area","The variety of life at all levels — genetic, species, and ecosystem","Only plant species","Only marine organisms"],a:1,e:"Biodiversity encompasses the full variety of life: genetic diversity within species, species diversity, and ecosystem diversity."},
-  {t:"Global Climate Change",q:"Ozone layer depletion is primarily caused by:",o:["Carbon dioxide","Chlorofluorocarbons (CFCs)","Methane","Water vapor"],a:1,e:"CFCs release chlorine atoms in the stratosphere that catalytically destroy ozone molecules."},
-  {t:"Global Climate Change",q:"Acid rain is caused mainly by emissions of:",o:["Carbon dioxide and methane","Sulphur dioxide and nitrogen oxides","Oxygen and hydrogen","CFCs and ozone"],a:1,e:"SO₂ and NOₓ from burning fossil fuels react with water vapor to form sulphuric and nitric acids."},
-  {t:"Sustainable Development",q:"The concept of 'intergenerational equity' in sustainability means:",o:["Only the current generation matters","Future generations have the right to the same resources and opportunities","Resources should be used up now","Equity only applies within one generation"],a:1,e:"Intergenerational equity is the ethical principle that we must not compromise future generations' access to resources."},
-  {t:"Natural Resources",q:"Desertification is:",o:["The creation of new deserts for tourism","Land degradation in dry areas due to climate and human activities","A type of irrigation","Planting desert plants"],a:1,e:"Desertification is the process by which fertile land becomes increasingly arid, often due to overgrazing, deforestation, and drought."},
-  {t:"Sustainable Development",q:"Which of these is NOT a principle of sustainable development?",o:["Polluter pays principle","Precautionary principle","Maximum exploitation principle","Intergenerational equity"],a:2,e:"'Maximum exploitation' contradicts sustainability. The polluter pays, precautionary, and intergenerational equity principles all support it."},
-  {t:"MDGs & SDGs",q:"SDG 7 aims to ensure:",o:["Zero hunger","Affordable and clean energy for all","Gender equality","Life on land"],a:1,e:"SDG 7 focuses on ensuring access to affordable, reliable, sustainable, and modern energy for all."},
-  {t:"Population & Economic Growth",q:"The 'tragedy of the commons' describes:",o:["A successful shared resource system","Overexploitation of shared resources when individuals act in self-interest","Government land redistribution","A historical battle"],a:1,e:"The tragedy of the commons shows how individuals acting in self-interest can deplete shared resources, harming everyone."},
-  {t:"Environment & Ecosystem",q:"A food web differs from a food chain because it:",o:["Is simpler","Shows multiple interconnected feeding relationships","Includes only producers","Ignores decomposers"],a:1,e:"A food web is a complex network of interconnected food chains showing the full picture of who eats whom in an ecosystem."},
-  {t:"Sustainable Development",q:"The Rio+20 conference (2012) resulted in the document titled:",o:["Our Common Future","The Limits to Growth","The Future We Want","Silent Spring"],a:2,e:"'The Future We Want' was the outcome document of the 2012 Rio+20 conference, renewing commitment to sustainable development."},
-  {t:"Environment & Ecosystem",q:"The IPAT identity (I = P × A × T) relates to:",o:["Agricultural production","Population growth only","Environmental impact","Economic growth only"],a:2,e:"IPAT is a formula expressing how environmental Impact (I) is driven by Population (P), Affluence (A), and Technology (T)."},
-  {t:"Environment & Ecosystem",q:"In the IPAT equation, 'P' stands for:",o:["Production","Pollution","Policy","Population"],a:3,e:"P = Population. The equation shows that environmental impact scales with population size, affluence, and technology."},
-  {t:"Environment & Ecosystem",q:"In the IPAT equation, 'A' stands for:",o:["Agriculture","Affluence","Atmosphere","Adaptation"],a:1,e:"A = Affluence (consumption per capita). Higher affluence typically means more resource use per person."},
-  {t:"Environment & Ecosystem",q:"In the IPAT equation, 'T' stands for:",o:["Territory","Trade","Technology","Taxation"],a:2,e:"T = Technology, specifically the environmental impact per unit of consumption. Cleaner tech reduces T."},
+// BIO-ECONOMY
+{t:"Bio-economy",q:"Bio-economy uses:",o:["Only oil","Biological resources for sustainable production","No technology","Only medicine"],a:1,e:"Leverages renewable biological resources across sectors."},
+{t:"Bio-economy",q:"Bio-economy as green economy emphasizes:",o:["Maximizing fossil fuels","Growth reducing environmental risks","Ignoring equity","Only agriculture"],a:1,e:"Low-carbon, resource-efficient, socially inclusive growth."},
+{t:"Bio-economy",q:"A bio-economy principle is:",o:["Unlimited extraction","Sustainable use of biological resources","Fossil fuel dependence","Ignoring innovation"],a:1,e:"Sustainable, efficient use of biological resources."},
+{t:"Bio-economy",q:"Georgescu-Roegen linked economics to:",o:["Market prices only","Laws of thermodynamics","Political platforms","Military strategy"],a:1,e:"Entropy means resources degrade irreversibly."},
+{t:"Bio-economy",q:"Bio-economy strategy involves:",o:["Abandoning technology","Biotechnology replacing fossil inputs","Only traditional farming","Reducing all activity"],a:1,e:"Innovation in biotechnology and bio-based industries."},
+{t:"Bio-economy",q:"Central to bio-economy:",o:["Fossil fuel refining","Biotechnology and biological resources","Coal mining","Nuclear energy"],a:1,e:"Bio-economy revolves around biotechnology."},
+{t:"Bio-economy",q:"Bio-economy as ecological economics says:",o:["Economy grows infinitely","Economy is constrained by ecological limits","Nature has no value","Only GDP matters"],a:1,e:"Economy bounded by natural limits."},
+{t:"Bio-economy",q:"A bio-based product:",o:["Plastic from petroleum","Biofuel from sugarcane","Steel","Cement"],a:1,e:"From renewable biological resources."},
+{t:"Bio-economy",q:"OECD's bio-economy report:",o:["Our Common Future","The Bio-economy to 2030","Limits to Growth","Silent Spring"],a:1,e:"Outlined bio-economy policy strategies."},
+{t:"Bio-economy",q:"Bioplastics are significant because they:",o:["Come from fossil fuels","Come from renewable sources and can be biodegradable","Are more toxic","Can't be manufactured"],a:1,e:"Use renewable feedstocks, reducing petroleum dependence."},
+{t:"Bio-economy",q:"EU bio-economy strategy focuses on:",o:["More fossil fuels","Renewable biological resources for food, materials, energy","Reducing agriculture","Only pharma"],a:1,e:"Biological resources across multiple sectors."},
 
-  // User-added questions
-  {t:"Environment & Ecosystem",q:"Environment refers to:",o:["Only plants","Only animals","The surroundings of living and non-living things","Only water"],a:2,e:"Environment encompasses everything around us — both living (plants, animals) and non-living (air, water, soil) components."},
-  {t:"Environment & Ecosystem",q:"The biotic component of the environment includes:",o:["Soil and water","Plants and animals","Air and sunlight","Rocks"],a:1,e:"Biotic means living. Plants and animals are living components, while soil, water, air, sunlight, and rocks are abiotic."},
-  {t:"Environment & Ecosystem",q:"Abiotic factors include:",o:["Plants","Animals","Microorganisms","Soil and sunlight"],a:3,e:"Abiotic factors are non-living elements like soil, sunlight, temperature, and water. Plants, animals, and microorganisms are biotic."},
-  {t:"Sustainable Development",q:"The IPAT identity relates to:",o:["Population growth","Environmental impact","Economic growth","Agricultural production"],a:1,e:"The IPAT equation (I = P × A × T) models how Population, Affluence, and Technology combine to determine environmental Impact."},
+// ECOTOURISM
+{t:"Ecotourism",q:"Ecotourism is:",o:["Mass beach tourism","Responsible travel conserving environment and benefiting locals","Luxury hotels","Industrial tourism"],a:1,e:"Combines conservation, community benefit, and education."},
+{t:"Ecotourism",q:"Key ecotourism benefit:",o:["More pollution","Income for communities while preserving nature","Habitat destruction","Overcrowding"],a:1,e:"Revenue for communities incentivizes conservation."},
+{t:"Ecotourism",q:"Negative ecotourism impact:",o:["Too much conservation","Wildlife disturbance if poorly managed","Excessive benefit","Too much education"],a:1,e:"Poor management can disturb wildlife and strain resources."},
+{t:"Ecotourism",q:"Central ecotourism principle:",o:["Maximize visitors","Minimize impact while educating","Build forest resorts","Exploit resources"],a:1,e:"Minimal footprint with meaningful education."},
+{t:"Ecotourism",q:"Ecotourism aids sustainability by:",o:["Replacing all industries","Linking conservation with local economics","Ignoring communities","Promoting deforestation"],a:1,e:"Bridges conservation with economic livelihood."},
+{t:"Ecotourism",q:"NOT a characteristic of ecotourism:",o:["Environmental education","Community benefit","Mass tourism infrastructure","Conservation focus"],a:2,e:"Ecotourism is small-scale and low-impact."},
+{t:"Ecotourism",q:"Ecotourism pioneer country:",o:["USA","Costa Rica","China","Russia"],a:1,e:"Costa Rica leads globally in ecotourism."},
+{t:"Ecotourism",q:"Greenwashing in tourism is:",o:["Genuine eco-practices","Falsely marketing as eco-friendly","Washing linens green","Government regulation"],a:1,e:"False environmental claims to attract conscious consumers."},
+{t:"Ecotourism",q:"CBNRM involves:",o:["Government controlling all","Local communities managing natural resources","Foreign extraction","Ignoring locals"],a:1,e:"Empowers communities to manage resources sustainably."},
 
-  // User-added questions batch 2
-  {t:"Environment & Ecosystem",q:"Which of the following is NOT part of an ecosystem?",o:["Producers","Consumers","Decomposers","Computers"],a:3,e:"Ecosystems consist of producers, consumers, and decomposers interacting with their environment. Computers are human-made objects."},
-  {t:"Environment & Ecosystem",q:"Green plants are known as:",o:["Consumers","Producers","Decomposers","Parasites"],a:1,e:"Plants produce food through photosynthesis, making them the producers in an ecosystem."},
-  {t:"Environment & Ecosystem",q:"Animals that eat plants are called:",o:["Carnivores","Herbivores","Omnivores","Parasites"],a:1,e:"Herbivores are primary consumers that feed exclusively on plant matter."},
-  {t:"Environment & Ecosystem",q:"Animals that eat both plants and animals are:",o:["Carnivores","Herbivores","Omnivores","Decomposers"],a:2,e:"Omnivores have a mixed diet of both plant and animal matter — humans are a common example."},
-  {t:"Environment & Ecosystem",q:"Organisms that break down dead materials are:",o:["Producers","Decomposers","Consumers","Predators"],a:1,e:"Decomposers like bacteria and fungi break down dead organic matter, recycling nutrients back into the ecosystem."},
-  {t:"Environmental Issues",q:"Environmental pollution refers to:",o:["Improvement of environment","Contamination of environment","Conservation of nature","Protection of wildlife"],a:1,e:"Pollution is the introduction of harmful contaminants into the natural environment."},
-  {t:"Environmental Issues",q:"Air pollution is mainly caused by:",o:["Trees","Vehicles and industries","Rivers","Rain"],a:1,e:"Vehicle exhaust and industrial emissions are the primary sources of air pollution in most regions."},
-  {t:"Global Climate Change",q:"Which gas contributes most to global warming?",o:["Oxygen","Nitrogen","Carbon dioxide","Helium"],a:2,e:"CO₂ is the dominant greenhouse gas from human activities, primarily from burning fossil fuels."},
-  {t:"Global Climate Change",q:"Global warming leads to:",o:["Decrease in temperature","Increase in sea level","Freezing oceans","Less rainfall"],a:1,e:"Rising temperatures cause thermal expansion of water and ice sheet melting, both raising sea levels."},
-  {t:"Environmental Issues",q:"Which activity causes soil erosion?",o:["Planting trees","Overgrazing","Conservation","Irrigation"],a:1,e:"Overgrazing removes vegetation cover, leaving soil exposed and vulnerable to erosion by wind and water."},
-  {t:"Environmental Issues",q:"Noise pollution mainly occurs in:",o:["Quiet villages","Industrial cities","Forest areas","Farms"],a:1,e:"Industrial areas and cities have concentrated sources of noise from factories, traffic, and construction."},
-  {t:"Environmental Issues",q:"Water pollution can be caused by:",o:["Industrial waste","Rainwater","Sunlight","Wind"],a:0,e:"Industrial effluents containing chemicals and heavy metals are a major source of water contamination."},
-  {t:"Sustainable Development",q:"The Brundtland Report was published in:",o:["1972","1987","1992","2000"],a:1,e:"'Our Common Future' was published in 1987 by the World Commission on Environment and Development."},
-  {t:"Sustainable Development",q:"The Earth Summit took place in:",o:["1987","1992","2000","2005"],a:1,e:"The UN Conference on Environment and Development was held in Rio de Janeiro in 1992."},
-  {t:"Sustainable Development",q:"Agenda 21 was adopted at:",o:["Earth Summit","Kyoto meeting","UN assembly","Paris conference"],a:0,e:"Agenda 21 was the comprehensive action plan adopted at the 1992 Earth Summit in Rio."},
-  {t:"Environmental Organizations",q:"Greenpeace is an example of:",o:["Government agency","Environmental NGO","Political party","Military organization"],a:1,e:"Greenpeace is a non-governmental organization focused on environmental activism and advocacy."},
-  {t:"Environmental Organizations",q:"The United Nations Environment Programme is abbreviated as:",o:["UNEP","UNDP","UNESCO","WHO"],a:0,e:"UNEP coordinates the UN's environmental activities and assists developing countries on environmental policies."},
-  {t:"Environmental Organizations",q:"UNEP headquarters is located in:",o:["New York","Paris","Nairobi","Geneva"],a:2,e:"UNEP is headquartered in Nairobi, Kenya — making it one of the few UN agencies based in the developing world."},
-  {t:"Global Climate Change",q:"Climate change refers to:",o:["Short-term weather","Long-term change in climate patterns","Daily temperature change","Wind movement"],a:1,e:"Climate change involves sustained shifts in temperature, precipitation, and other patterns over decades or longer."},
-  {t:"Global Climate Change",q:"Burning fossil fuels releases:",o:["Nitrogen","Oxygen","Carbon dioxide","Hydrogen"],a:2,e:"Combustion of coal, oil, and gas releases CO₂ as the carbon in the fuel combines with atmospheric oxygen."},
-  {t:"Global Climate Change",q:"The Kyoto Protocol focuses on:",o:["Climate change reduction","Trade development","Agriculture","Transport"],a:0,e:"The Kyoto Protocol (1997) set legally binding emission reduction targets for industrialized countries."},
-  {t:"Conservation",q:"National parks are established to:",o:["Build houses","Protect wildlife","Farm crops","Mine minerals"],a:1,e:"National parks are designated protected areas aimed at conserving wildlife, habitats, and natural landscapes."},
-  {t:"Conservation",q:"Reforestation means:",o:["Cutting trees","Planting trees again","Burning forests","Building roads"],a:1,e:"Reforestation is the process of replanting trees in areas where forests have been depleted."},
-  {t:"Environmental Issues",q:"Land degradation refers to:",o:["Improvement of soil","Decline in land quality","Increase in vegetation","Soil conservation"],a:1,e:"Land degradation is the deterioration of land productivity through erosion, nutrient loss, and contamination."},
-  {t:"Sustainable Development",q:"Sustainable agriculture promotes:",o:["Long-term farming without harming the environment","Overuse of chemicals","Continuous deforestation","Soil degradation"],a:0,e:"Sustainable agriculture meets current food needs while preserving resources for future production."},
-  {t:"Environmental Issues",q:"Urbanization refers to:",o:["Movement of people to rural areas","Growth of cities","Reduction of population","Increase in forests"],a:1,e:"Urbanization is the increasing concentration of people in cities, often driving environmental pressures."},
-  {t:"Natural Resources",q:"Natural resources include:",o:["Only minerals","Only water","Only forests","Minerals, water, and forests — all of the above"],a:3,e:"Natural resources encompass all materials and energy sources found in nature, including minerals, water, and forests."},
-  {t:"Environment & Ecosystem",q:"Ecological balance means:",o:["Harmony between organisms and environment","Destruction of nature","Pollution increase","Elimination of animals"],a:0,e:"Ecological balance is a stable state where species and their environment exist in dynamic equilibrium."},
-  {t:"Environment & Ecosystem",q:"Habitat destruction leads to:",o:["Increase in biodiversity","Loss of biodiversity","Environmental improvement","Soil formation"],a:1,e:"Destroying habitats removes the living spaces organisms depend on, driving species loss."},
-  {t:"Sustainable Development",q:"Carbon footprint refers to:",o:["Amount of carbon emissions caused by activities","Footprints in soil","Plant growth","Soil erosion"],a:0,e:"Your carbon footprint is the total greenhouse gas emissions caused directly and indirectly by your activities."},
-  {t:"Sustainable Development",q:"Ecological footprint measures:",o:["Human demand on natural resources","Soil fertility","Plant growth","Animal population"],a:0,e:"The ecological footprint estimates how much biologically productive land and sea area is needed to support a population's consumption."},
-  {t:"Sustainable Development",q:"Resource depletion occurs when:",o:["Resources are used faster than they are replaced","Resources increase","Conservation occurs","Recycling occurs"],a:0,e:"Depletion happens when the rate of extraction exceeds the rate of natural regeneration."},
-  {t:"IPAT Concept",q:"The IPAT equation is:",o:["I = P + A + T","I = P × A × T","I = P – A – T","I = P / A / T"],a:1,e:"IPAT multiplies Population × Affluence × Technology to estimate environmental Impact."},
-  {t:"IPAT Concept",q:"In IPAT, I stands for:",o:["Income","Industry","Impact","Investment"],a:2,e:"I = Impact, the total environmental effect of human activity."},
-  {t:"Global Climate Change",q:"The Paris Agreement was signed in:",o:["2015","1992","1987","2000"],a:0,e:"The Paris Agreement was adopted in December 2015 at COP21, committing nations to limit warming."},
-  {t:"Conservation",q:"Environmental Impact Assessment (EIA) is used to:",o:["Evaluate environmental effects of projects","Increase pollution","Ignore environmental laws","Destroy habitats"],a:0,e:"EIA is a systematic process to predict and evaluate the environmental consequences of proposed projects before approval."},
-  {t:"Sustainable Development",q:"Green economy promotes:",o:["Environmentally friendly economic development","Pollution increase","Resource destruction","Industrial pollution"],a:0,e:"A green economy aims for improved well-being and social equity while reducing environmental risks."},
-  {t:"Global Climate Change",q:"Climate resilience refers to:",o:["Ability to recover from climate impacts","Ignoring climate change","Increasing pollution","Destroying forests"],a:0,e:"Climate resilience is the capacity of systems, communities, and societies to absorb and recover from climate-related shocks."},
-  {t:"Global Climate Change",q:"Climate adaptation refers to:",o:["Adjusting to climate change effects","Ignoring climate change","Increasing pollution","Destroying forests"],a:0,e:"Adaptation involves adjusting practices, processes, and structures to moderate potential damage from climate change."},
-  {t:"Global Climate Change",q:"Climate mitigation involves:",o:["Reducing greenhouse gas emissions","Increasing pollution","Destroying forests","Ignoring climate change"],a:0,e:"Mitigation focuses on reducing or preventing greenhouse gas emissions to limit the severity of future climate change."},
-  {t:"Environmental Issues",q:"Flooding can be caused by:",o:["Climate change","Soil conservation","Reduced rainfall","Reforestation"],a:0,e:"Climate change intensifies rainfall patterns and sea level rise, both increasing flood risk."},
-  {t:"Conservation",q:"Recycling helps to:",o:["Reduce waste and conserve resources","Increase pollution","Destroy forests","Waste energy"],a:0,e:"Recycling diverts materials from landfills and reduces the need for raw resource extraction."},
-  {t:"Sustainable Development",q:"Energy efficiency means:",o:["Using less energy to perform the same task","Wasting energy","Increasing energy consumption","Ignoring energy use"],a:0,e:"Energy efficiency is about getting the same output or service with less energy input."},
-  {t:"Sustainable Development",q:"Sustainable consumption involves:",o:["Responsible use of resources","Wasting resources","Ignoring environment","Excess consumption"],a:0,e:"Sustainable consumption means using goods and services that meet basic needs while minimizing environmental harm."},
-  {t:"Environmental Issues",q:"Soil fertility refers to:",o:["Soil dryness","Soil pollution","Ability of soil to support plant growth","Soil erosion"],a:2,e:"Soil fertility is determined by nutrient content, organic matter, and the capacity to sustain plant life."},
-  {t:"Environmental Issues",q:"Pollution prevention involves:",o:["Controlling pollution before it occurs","Increasing waste","Burning waste","Ignoring pollution"],a:0,e:"Prevention is the most effective approach — eliminating pollution at the source rather than managing it after the fact."},
+// CONSERVATION
+{t:"Conservation",q:"National parks protect:",o:["Houses","Wildlife and natural landscapes","Crops","Mines"],a:1,e:"Designated protected areas for conservation."},
+{t:"Conservation",q:"Reforestation means:",o:["Cutting trees","Replanting trees in deforested areas","Burning forests","Building roads"],a:1,e:"Replanting where forests were depleted."},
+{t:"Conservation",q:"EIA evaluates:",o:["Environmental effects of projects","Pollution increase","Environmental law ignorance","Habitat destruction"],a:0,e:"Predicts environmental consequences before project approval."},
+{t:"Conservation",q:"Recycling helps:",o:["Reduce waste and conserve resources","Increase pollution","Destroy forests","Waste energy"],a:0,e:"Diverts from landfills, reduces raw resource need."},
+{t:"Conservation",q:"Wildlife conservation protects:",o:["Only animals","Only plants","Biodiversity","Only rivers"],a:2,e:"The full spectrum — plants, animals, and ecosystems."},
+{t:"Conservation",q:"In-situ conservation means:",o:["Conservation in zoos","In natural habitat","Moving species","Freezing genetic material"],a:1,e:"Protecting species within their natural ecosystems."},
+{t:"Conservation",q:"Ex-situ conservation means:",o:["In natural habitats","Outside natural habitats (zoos, seed banks)","Deforestation","Urbanization"],a:1,e:"Preservation outside natural environment."},
+{t:"Conservation",q:"A biodiversity hotspot has:",o:["Low diversity","High species richness under significant threat","No humans","Only marine species"],a:1,e:"Exceptional endemic species concentrations facing habitat loss."},
+{t:"Conservation",q:"IUCN Red List classifies:",o:["Countries by GDP","Species by extinction risk","Rivers by pollution","Cities by population"],a:1,e:"Most comprehensive inventory of species' conservation status."},
+{t:"Conservation",q:"Afforestation differs from reforestation by:",o:["Cutting more trees","Planting trees where none existed before","Only fruit trees","Removing invasives"],a:1,e:"Creates new forests on previously non-forested land."},
+
+// ENVIRONMENTAL ORGANIZATIONS
+{t:"Environmental Organizations",q:"Greenpeace is:",o:["Government agency","Environmental NGO","Political party","Military"],a:1,e:"Non-governmental environmental activism organization."},
+{t:"Environmental Organizations",q:"UNEP stands for:",o:["UN Education Programme","UN Environment Programme","Universal Nature Project","UN Network for Policy"],a:1,e:"Coordinates UN environmental activities."},
+{t:"Environmental Organizations",q:"UNEP HQ is in:",o:["New York","Paris","Nairobi","Geneva"],a:2,e:"Headquartered in Nairobi, Kenya."},
+{t:"Environmental Organizations",q:"WWF works on:",o:["Military","Conservation and reducing threats to biodiversity","Space","Financial markets"],a:1,e:"Wildlife conservation and ecological footprint reduction."},
+{t:"Environmental Organizations",q:"IUCN stands for:",o:["International Union for Conservation of Nature","International United Council","Institute for Urban Communities","International Union for Climate"],a:0,e:"Global authority on natural world status."},
+{t:"Environmental Organizations",q:"Friends of the Earth is:",o:["Government agency","International environmental advocacy network","Mining company","Travel agency"],a:1,e:"Global network campaigning on environmental and social issues."},
 ];
 
-// Shuffle utility
-function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+// ===== STATE =====
+let questions=[],qi=0,correct=0,answered=0,skipped=0,streak=0,bestStreak=0;
+let weakTopics={},bookmarks=new Set(),timerInterval,seconds=0;
+let sessionSize=0,selectedTopics=[],mode='fresh';
+const allTopics=[...new Set(Q.map(q=>q.t))];
 
-let mode='all', questions=[], qi=0, correct=0, answered=0, streak=0, bestStreak=0;
-let weakTopics={};
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+function fmt(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60)}
 
-function setMode(m){
-  mode=m;
-  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`.mode-btn[onclick="setMode('${m}')"]`).classList.add('active');
-  startQuiz();
+// ===== SETUP =====
+function showSetup(){
+  document.getElementById('quizHeader').classList.add('hidden');
+  document.getElementById('quizArea').classList.add('hidden');
+  document.getElementById('resultsArea').classList.add('hidden');
+  clearInterval(timerInterval);
+  let tc={};Q.forEach(q=>tc[q.t]=(tc[q.t]||0)+1);
+  document.getElementById('setupArea').innerHTML=`<div class="setup">
+  <h2>Configure Your Session</h2>
+  <div class="setup-section"><label>Mode</label>
+  <div class="mode-pills">
+    <div class="pill active" onclick="pickMode(this,'fresh')">Fresh Start</div>
+    <div class="pill" onclick="pickMode(this,'weak')">Weak Areas</div>
+    <div class="pill" onclick="pickMode(this,'bookmarks')">Bookmarked (${bookmarks.size})</div>
+  </div></div>
+  <div class="setup-section" id="topicSection"><label>Topics <span style="color:var(--text);text-transform:none;font-family:DM Sans;font-weight:400">(tap to filter)</span></label>
+  <div class="topic-chips">${allTopics.map(t=>`<div class="chip active" onclick="toggleChip(this)">${t} <span style="opacity:.5">(${tc[t]})</span></div>`).join('')}</div></div>
+  <div class="setup-section"><label>Questions per session</label>
+  <div class="size-options">
+    <div class="size-btn" onclick="pickSize(this,10)">10</div>
+    <div class="size-btn" onclick="pickSize(this,20)">20</div>
+    <div class="size-btn" onclick="pickSize(this,30)">30</div>
+    <div class="size-btn" onclick="pickSize(this,50)">50</div>
+    <div class="size-btn" onclick="pickSize(this,100)">100</div>
+    <div class="size-btn active" onclick="pickSize(this,0)">All</div>
+  </div></div>
+  <div class="q-total" id="qTotal">${Q.length} questions available</div>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+  </div>`;
+  document.getElementById('setupArea').classList.remove('hidden');
+  sessionSize=0;mode='fresh';selectedTopics=[...allTopics];
 }
 
+function pickMode(el,m){
+  el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');mode=m;
+  document.getElementById('topicSection').style.display=m==='bookmarks'?'none':'';
+  updTotal();
+}
+function toggleChip(el){el.classList.toggle('active');updTotal()}
+function pickSize(el,n){
+  el.parentElement.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');sessionSize=n;updTotal();
+}
+function updTotal(){
+  selectedTopics=[];
+  document.querySelectorAll('.chip.active').forEach(c=>selectedTopics.push(c.textContent.replace(/\s*\(\d+\)/,'')));
+  let pool;
+  if(mode==='bookmarks') pool=bookmarks.size;
+  else if(mode==='weak'){let w=Object.keys(weakTopics);pool=w.length?Q.filter(q=>w.includes(q.t)).length:Q.length;}
+  else pool=Q.filter(q=>selectedTopics.includes(q.t)).length;
+  let n=sessionSize?Math.min(sessionSize,pool):pool;
+  let el=document.getElementById('qTotal');
+  if(el) el.textContent=n+' questions in this session';
+}
+
+// ===== QUIZ =====
 function startQuiz(){
-  qi=0;correct=0;answered=0;streak=0;
-  document.getElementById('resultsArea').classList.add('hidden');
+  document.getElementById('setupArea').classList.add('hidden');
+  document.getElementById('quizHeader').classList.remove('hidden');
   document.getElementById('quizArea').classList.remove('hidden');
-  
-  if(mode==='weak'){
-    let topics=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
-    if(topics.length===0) topics=[...new Set(allQuestions.map(q=>q.t))];
-    questions=shuffle(allQuestions.filter(q=>topics.includes(q.t)));
-  } else if(mode==='random'){
-    questions=shuffle(allQuestions).slice(0,20);
-  } else {
-    questions=shuffle(allQuestions);
-  }
-  updateStats();
-  showQuestion();
+  document.getElementById('resultsArea').classList.add('hidden');
+  qi=0;correct=0;answered=0;skipped=0;streak=0;bestStreak=0;seconds=0;
+  let pool;
+  if(mode==='bookmarks') pool=Q.filter((_,i)=>bookmarks.has(i));
+  else if(mode==='weak'){let w=Object.keys(weakTopics);pool=w.length?Q.filter(q=>w.includes(q.t)):shuffle(Q);}
+  else pool=Q.filter(q=>selectedTopics.includes(q.t));
+  questions=shuffle(pool);
+  if(sessionSize&&sessionSize<questions.length) questions=questions.slice(0,sessionSize);
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{seconds++;document.getElementById('timerNum').textContent=fmt(seconds)},1000);
+  document.getElementById('timerNum').textContent='0:00';
+  updateStats();showQuestion();
 }
 
 function updateStats(){
-  let pct=answered?Math.round((correct/answered)*100):0;
+  let t=answered+skipped,pct=answered?Math.round(correct/answered*100):0;
   document.getElementById('scoreNum').textContent=pct+'%';
   document.getElementById('streakNum').textContent=streak;
-  document.getElementById('doneNum').textContent=answered+'/'+questions.length;
-  document.getElementById('progFill').style.width=(answered/questions.length*100)+'%';
+  document.getElementById('doneNum').textContent=t+'/'+questions.length;
+  document.getElementById('progFill').style.width=(t/questions.length*100)+'%';
 }
 
-let currentShuffledAnswer=-1;
-
+let csA=-1;
 function showQuestion(){
   if(qi>=questions.length){showResults();return}
-  let q=questions[qi];
-  // Build indices and shuffle them
-  let indices=[0,1,2,3];
-  for(let i=indices.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]]}
-  // Track where the correct answer ended up
-  currentShuffledAnswer=indices.indexOf(q.a);
-  let shuffledOpts=indices.map(i=>q.o[i]);
-
-  let html=`<div class="q-counter">QUESTION ${qi+1} of ${questions.length}</div>
-  <div class="question-card">
-    <span class="topic-tag">${q.t}</span>
-    <h2>${q.q}</h2>
+  let q=questions[qi],gi=Q.indexOf(q),bm=bookmarks.has(gi);
+  let ix=[0,1,2,3];for(let i=3;i>0;i--){let j=Math.floor(Math.random()*(i+1));[ix[i],ix[j]]=[ix[j],ix[i]]}
+  csA=ix.indexOf(q.a);let so=ix.map(i=>q.o[i]);
+  document.getElementById('quizArea').innerHTML=`<div class="q-counter">
+    <span>Q ${qi+1} / ${questions.length}</span>
+    <span class="actions"><button onclick="togBM(${gi})" id="bmBtn" class="${bm?'bookmarked':''}" title="Bookmark">★</button></span>
   </div>
-  <div class="options">`;
-  let keys=['A','B','C','D'];
-  shuffledOpts.forEach((opt,i)=>{
-    html+=`<button class="opt-btn" onclick="pick(${i})" id="opt${i}">
-      <span class="key">${keys[i]}</span><span>${opt}</span>
-    </button>`;
-  });
-  html+=`</div><div id="feedback"></div>`;
-  document.getElementById('quizArea').innerHTML=html;
+  <div class="question-card"><span class="topic-tag">${q.t}</span><h2>${q.q}</h2></div>
+  <div class="options">${so.map((o,i)=>`<button class="opt-btn" onclick="pick(${i})" id="opt${i}"><span class="key">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')}</div>
+  <div id="fb"></div>
+  <button class="skip-btn" id="skipBtn" onclick="doSkip()">Skip →</button>`;
 }
+
+function togBM(i){if(bookmarks.has(i))bookmarks.delete(i);else bookmarks.add(i);let b=document.getElementById('bmBtn');if(b)b.classList.toggle('bookmarked')}
+function doSkip(){skipped++;qi++;updateStats();showQuestion()}
 
 function pick(i){
-  let q=questions[qi];
-  let btns=document.querySelectorAll('.opt-btn');
+  let q=questions[qi],btns=document.querySelectorAll('.opt-btn');
   btns.forEach(b=>{b.classList.add('disabled');b.onclick=null});
-  
-  answered++;
-  if(i===currentShuffledAnswer){
-    correct++;streak++;
-    if(streak>bestStreak)bestStreak=streak;
-    btns[i].classList.add('selected-correct');
-  } else {
-    streak=0;
-    btns[i].classList.add('selected-wrong');
-    btns[currentShuffledAnswer].classList.add('show-correct');
-    weakTopics[q.t]=(weakTopics[q.t]||0)+1;
-  }
+  document.getElementById('skipBtn').classList.add('hidden');
+  answered++;let ok=i===csA;
+  if(ok){correct++;streak++;if(streak>bestStreak)bestStreak=streak;btns[i].classList.add('selected-correct')}
+  else{streak=0;btns[i].classList.add('selected-wrong');btns[csA].classList.add('show-correct');weakTopics[q.t]=(weakTopics[q.t]||0)+1}
   updateStats();
-  
-  let fb=`<div class="explanation"><strong>${i===currentShuffledAnswer?'Correct!':'Not quite.'}</strong> ${q.e}</div>
-  <button class="next-btn" onclick="qi++;showQuestion()">${qi<questions.length-1?'Next Question →':'See Results →'}</button>`;
-  document.getElementById('feedback').innerHTML=fb;
+  document.getElementById('fb').innerHTML=`<div class="explanation"><strong>${ok?'Correct!':'Not quite.'}</strong> ${q.e}</div>
+  <button class="next-btn" onclick="qi++;showQuestion()">${qi>=questions.length-1?'See Results →':'Next →'}</button>`;
 }
 
+// ===== RESULTS =====
 function showResults(){
+  clearInterval(timerInterval);
+  document.getElementById('quizHeader').classList.add('hidden');
   document.getElementById('quizArea').classList.add('hidden');
-  let pct=Math.round((correct/answered)*100);
-  let msg=pct>=80?'Strong performance! You\'re well-prepared.':pct>=60?'Good foundation. Review your weak areas once more.':'Keep at it — focus on the topics flagged below.';
-  let weakList=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]);
-  let weakHtml=weakList.length?'<br><br><strong style="color:var(--accent2)">Focus areas:</strong> '+weakList.slice(0,3).map(e=>e[0]).join(', '):'';
-  
-  document.getElementById('resultsArea').innerHTML=`<div class="results">
-    <div class="big">${pct}%</div>
-    <p>${correct} out of ${answered} correct · Best streak: ${bestStreak}${weakHtml}</p>
-    <p style="margin-top:12px">${msg}</p>
-    <button class="next-btn retry" onclick="setMode('all')" style="max-width:280px;margin:24px auto 8px">Retry All</button>
-    ${weakList.length?`<button class="next-btn retry" onclick="setMode('weak')" style="max-width:280px;margin:8px auto;background:linear-gradient(135deg,var(--accent2),#ec4899)">Practice Weak Areas</button>`:''}
-  </div>`;
   document.getElementById('resultsArea').classList.remove('hidden');
+  let pct=answered?Math.round(correct/answered*100):0;
+  let g,gc;if(pct>=70){g='A — Exam Ready';gc='grade-a'}else if(pct>=60){g='B — Almost There';gc='grade-b'}else if(pct>=50){g='C — Needs Work';gc='grade-c'}else{g='F — Keep Practicing';gc='grade-f'}
+  let wl=Object.entries(weakTopics).sort((a,b)=>b[1]-a[1]);
+  let html=`<div class="results"><div class="big">${pct}%</div><div class="grade ${gc}">${g}</div>
+  <p style="margin-top:12px">${correct} correct · ${answered-correct} wrong · ${skipped} skipped · ${fmt(seconds)}</p>
+  <p>Best streak: ${bestStreak}</p>`;
+  if(wl.length){
+    html+=`<div class="result-details"><h3>Topics to Review</h3>${wl.slice(0,6).map(([t,w])=>{
+      let c=w>3?'var(--wrong)':w>1?'var(--warn)':'var(--accent)';
+      return `<div class="topic-row"><span>${t}</span><span style="color:${c};font-family:'Space Mono',monospace;font-size:12px">${w} wrong</span></div>`}).join('')}</div>`;
+  }
+  html+=`<div class="result-btns"><button class="next-btn" onclick="showSetup()">New Session</button>
+  ${wl.length?`<button class="next-btn" style="background:linear-gradient(135deg,var(--accent2),#ec4899)" onclick="mode='weak';startQuiz()">Practice Weak Areas</button>`:''}
+  ${bookmarks.size?`<button class="next-btn" style="background:linear-gradient(135deg,var(--warn),#f97316)" onclick="mode='bookmarks';startQuiz()">Review Bookmarked (${bookmarks.size})</button>`:''}
+  </div></div>`;
+  document.getElementById('resultsArea').innerHTML=html;
 }
 
-startQuiz();
+showSetup();
 </script>
 </body>
 </html>
